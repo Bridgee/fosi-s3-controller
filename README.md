@@ -90,7 +90,9 @@ python tools/serve_preview.py --port 8765
 
 Open [the local simulator](http://127.0.0.1:8765/index.html?device=player).
 Use mouse/trackpad press-and-drag or touch swipes; reverse the swipe to return.
-Without `?device=player`, the page also shows navigation controls outside the dial.
+A page guide beside the dial explains what to try and how to navigate; on narrow
+screens it sits below the dial. It also follows artwork, standby and display sleep.
+Both HTML entries use the same guide and simulated controls.
 
 | Page | From the center player |
 | --- | --- |

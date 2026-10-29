@@ -13,7 +13,7 @@ CSP = ("default-src 'none'; script-src 'self' 'unsafe-inline'; "
        "style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; "
        "connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; "
        "worker-src 'none'; media-src 'none'")
-EXTRA = {"assets/clock/pixel-glyphs.js", "assets/timezones/rules.js",
+EXTRA = {"assets/preview/guide.js", "assets/preview/guide.css", "assets/clock/pixel-glyphs.js", "assets/timezones/rules.js",
          "assets/fonts/OFL-Montserrat.txt", "assets/fonts/OFL-NotoSansCJK.txt",
          "assets/fonts/UNICODE-DATA-LICENSE.txt", "assets/source-icons/CC0-1.0.txt",
          "LICENSE", "THIRD_PARTY_NOTICES.md"}

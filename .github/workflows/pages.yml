@@ -27,6 +27,7 @@ jobs:
       - run: python tools/sync_preview.py --check
       - run: python tools/test_pages.py
       - run: node tools/test_preview_parity.cjs
+      - run: node tools/test_simulator_guide.cjs
       - run: node tools/test_preview_transitions.cjs
       - run: node tools/test_music_intro.cjs
       - run: python tools/test_preview_lyrics.py

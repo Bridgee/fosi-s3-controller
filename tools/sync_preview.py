@@ -6,7 +6,7 @@ from pathlib import Path
 import argparse,hashlib,json,re,subprocess,tempfile,shutil
 ROOT=Path(__file__).resolve().parents[1]
 PAGES=('index.html','orbit-s3-preview.html')
-INPUTS=('firmware/OrbitS3/firmware_version.h','firmware/OrbitS3/orbit_ui.cpp','firmware/OrbitS3/button_layout.h','firmware/OrbitS3/ui_themes.h','firmware/OrbitS3/status_icons.cpp','firmware/OrbitS3/source_icons.cpp','firmware/OrbitS3/status_feedback.h','firmware/OrbitS3/metadata_font.c','firmware/OrbitS3/metadata_latin_metrics.h','firmware/OrbitS3/weather_labels.cpp','firmware/OrbitS3/weather_assets.cpp','firmware/OrbitS3/lyrics_icon.h','firmware/OrbitS3/swipe_gesture.h','firmware/OrbitS3/touch_regions.h','assets/themes.json','assets/lyrics/preview-data.json','assets/lyrics/preview-model.js','assets/lyrics/preview-ui.js','assets/screen-idle/preview.js','firmware/OrbitS3/lyrics.h','firmware/OrbitS3/lyrics_parser.cpp','firmware/OrbitS3/lyrics_protocol.h','firmware/OrbitS3/lyrics.cpp','assets/preview/layout.css','assets/preview/runtime.js','assets/preview/embed-frame.css','assets/clock/pixel-glyphs.js','assets/timezones/rules.js','assets/weather/catalog.js','assets/source-icons/protocols.json','assets/source-icons/symbols.html','assets/fonts/montserrat-source.json','ai/mock/preview.js','tools/sync_preview.py','tools/sync_source_icons.py','firmware/OrbitS3/source_status.h','firmware/OrbitS3/status_identity.h')
+INPUTS=('firmware/OrbitS3/firmware_version.h','firmware/OrbitS3/orbit_ui.cpp','firmware/OrbitS3/button_layout.h','firmware/OrbitS3/ui_themes.h','firmware/OrbitS3/status_icons.cpp','firmware/OrbitS3/source_icons.cpp','firmware/OrbitS3/status_feedback.h','firmware/OrbitS3/metadata_font.c','firmware/OrbitS3/metadata_latin_metrics.h','firmware/OrbitS3/weather_labels.cpp','firmware/OrbitS3/weather_assets.cpp','firmware/OrbitS3/lyrics_icon.h','firmware/OrbitS3/swipe_gesture.h','firmware/OrbitS3/touch_regions.h','assets/themes.json','assets/lyrics/preview-data.json','assets/lyrics/preview-model.js','assets/lyrics/preview-ui.js','assets/screen-idle/preview.js','firmware/OrbitS3/lyrics.h','firmware/OrbitS3/lyrics_parser.cpp','firmware/OrbitS3/lyrics_protocol.h','firmware/OrbitS3/lyrics.cpp','assets/preview/guide.js','assets/preview/guide.css','assets/preview/layout.css','assets/preview/runtime.js','assets/preview/embed-frame.css','assets/clock/pixel-glyphs.js','assets/timezones/rules.js','assets/weather/catalog.js','assets/source-icons/protocols.json','assets/source-icons/symbols.html','assets/fonts/montserrat-source.json','ai/mock/preview.js','tools/sync_preview.py','tools/sync_source_icons.py','firmware/OrbitS3/source_status.h','firmware/OrbitS3/status_identity.h')
 
 def script_json(value):
  return json.dumps(value,ensure_ascii=False,separators=(',',':')).replace('&','\\u0026').replace('<','\\u003c').replace('>','\\u003e').replace('\u2028','\\u2028').replace('\u2029','\\u2029')
@@ -101,6 +101,8 @@ def check():
   text=(ROOT/name).read_text()
   block=re.search(r'// orbit-preview-parity:start([\s\S]*?)// orbit-preview-parity:end',text)
   assert block and f'"firmwareVersion":"{version()}"' in block[1],name+' missing current contract'
+  assert text.count('src="assets/preview/guide.js"')==1,name+' missing shared simulator guide'
+  assert text.count('href="assets/preview/guide.css"')==1,name+' missing simulator guide styles'
   assert 'id="aboutFirmware"' in text
   for asset in ('assets/lyrics/preview-model.js','assets/lyrics/preview-ui.js'):assert (ROOT/asset).read_text() in text,name+' stale lyric model/UI'
   lyric_data=json.loads((ROOT/'assets/lyrics/preview-data.json').read_text())
@@ -186,6 +188,10 @@ def generate():
  css=(out/'layout.css').read_text();runtime=(out/'runtime.js').read_text()
  for name in PAGES:
   path=ROOT/name;text=path.read_text()
+  if 'href="assets/preview/guide.css"' not in text:
+   text=text.replace('</style>','</style>\n<link rel="stylesheet" href="assets/preview/guide.css">',1)
+  if 'src="assets/preview/guide.js"' not in text:
+   text=re.sub(r'(<script>[\s\S]*?</script>)',lambda match:match[0]+'\n<script src="assets/preview/guide.js" defer></script>',text,count=1)
   lyric_data=json.loads((ROOT/'assets/lyrics/preview-data.json').read_text())
   lyric_block='// orbit-lyrics-preview:start\nconst lyricsPreviewCatalog='+script_json(lyric_data)+';\n'+(ROOT/'assets/lyrics/preview-model.js').read_text()+'\n'+(ROOT/'assets/lyrics/preview-ui.js').read_text()+'\n// orbit-lyrics-preview:end'
   text=re.sub(r'// orbit-lyrics-preview:start[\s\S]*?// orbit-lyrics-preview:end',lambda _:lyric_block,text,count=1)

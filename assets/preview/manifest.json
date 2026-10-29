@@ -285,6 +285,8 @@
     "firmware/OrbitS3/lyrics_parser.cpp": "1f72b93231b5bc376070b5393c8f5c3b20f406710e5e331bf31b18b6f94a2e70",
     "firmware/OrbitS3/lyrics_protocol.h": "1d955d4e515e800a1070652c1f4074ba6eeee9dc7287067ce828d61cda628350",
     "firmware/OrbitS3/lyrics.cpp": "c5cacd0bb544eaa837bb9d2a53d3967880c2d1173e50df61dd6285fdf6fa7fc2",
+    "assets/preview/guide.js": "7c293870edabf5b783efee9c7fe8aa512d469d0e921ccd30ce3c888542a17680",
+    "assets/preview/guide.css": "0b37626dd1dbc4bca8d7ba843956f9e7d6519e2187f09a834c80f531dcf3df45",
     "assets/preview/layout.css": "dd8171719034bc8bdb0996ba71274307d4a42edc8c233e67819c1a31b47845de",
     "assets/preview/runtime.js": "446414f1fe51696bdc2540f7ad0892689a0c695498aaa7c946bd4794df431fba",
     "assets/preview/embed-frame.css": "300e4d5ff34443298b900af98d326d33a8e8488e7bc9e942d13fbd60dee1b58b",
@@ -295,7 +297,7 @@
     "assets/source-icons/symbols.html": "a1516f1eed8e3d8e2978171b03f3ee082fc8c17bfb4b5d4149f242b882c6af3b",
     "assets/fonts/montserrat-source.json": "a09efa3911aa9bfb5aada9d1075892c5ba999e74a05f91ea5d00cc6f59d0ea45",
     "ai/mock/preview.js": "921db2147ab98e4dea5d7204c062c6ea9d0bff55f36aadc43b6e34054fb770f5",
-    "tools/sync_preview.py": "1eb9cf920cfa879db7d75187f7ad7f16275065bd528b8319847e90ce7e5d5e7b",
+    "tools/sync_preview.py": "950f52e46a1ed37b993bdff6d09eeecc3ce1ff34bc7a0565ee4a184aa2ef2361",
     "tools/sync_source_icons.py": "5af082f2f9bc6ee0139ce6c9f4b8e44cca675d375f86cc1828c80a412468e046",
     "firmware/OrbitS3/source_status.h": "6422e6bdf3426e8ae6326846e31d644010eb3f19981f0896e943ea3bfe6e6b93",
     "firmware/OrbitS3/status_identity.h": "2d1aca41dffae53dd135596506b75e2d8eac06ad5f300ac05df96a3a0e0e8481"

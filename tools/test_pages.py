@@ -16,6 +16,7 @@ class Resources(HTMLParser):
     def handle_starttag(self, tag, attrs):
         a=dict(attrs)
         if 'src' in a:self.paths.append(a['src'])
+        if tag=='link' and a.get('rel')=='stylesheet':self.paths.append(a['href'])
         if tag=='meta' and a.get('http-equiv')=='Content-Security-Policy':self.policies.append(a['content'])
 
 with tempfile.TemporaryDirectory(prefix='fosi-pages-test-') as d:

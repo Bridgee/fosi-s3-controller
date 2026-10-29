@@ -1,0 +1,23 @@
+/* Browser frame only; no styles inside the 480 px firmware display. */
+html.simulator-guided,html.simulator-guided body{height:auto;min-height:100%;overflow:auto;background:#eeefea}
+.simulator-guided header,.simulator-guided .intro,.simulator-guided .orbit-top,.simulator-guided .bottom,.simulator-guided .hint,.simulator-guided .preview-tools,.simulator-guided .keyboard-note,.simulator-guided .orbit-caption{display:none!important}
+html.simulator-guided .workspace{display:block;width:100%;height:auto;min-height:100svh;max-width:none;margin:0;padding:88px 24px 48px}
+.simulator-guided .stage{display:block!important;width:100%;height:auto;min-height:0;overflow:visible;justify-content:normal}
+.simulator-guided #orbit-s3-preview{padding:88px 24px 48px;overflow:visible;box-sizing:border-box}
+.simulator-shell{display:grid;grid-template-columns:var(--simulator-diameter,528px) minmax(0,300px);gap:48px;align-items:center;justify-content:center;max-width:1000px;margin:0 auto}
+.simulator-device{width:var(--simulator-diameter,528px);height:var(--simulator-diameter,528px);position:relative;justify-self:center}
+.simulator-device .device-wrap,.device-only .simulator-device .device-wrap,#orbit-s3-preview .simulator-device .device-wrap,.device-only #orbit-s3-preview .simulator-device .device-wrap{position:relative;top:auto;left:auto;margin:0!important;transform:scale(var(--simulator-scale,1))!important;transform-origin:top left!important}
+#orbit-s3-preview .simulator-device .device-holder{height:100%!important;width:100%}
+.simulator-guide{box-sizing:border-box;min-width:0;padding:8px 0 8px 28px;border-left:1px solid #cbd3c9;color:#384d40;font:400 14px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-align:left}
+.simulator-guide .simulator-guide-label{margin:0 0 17px;color:#687c6e;font-size:10px;font-weight:600;letter-spacing:1.9px}
+.simulator-guide h2{font-size:27px;line-height:1.15;font-weight:500;letter-spacing:-.7px;margin:0 0 12px;color:#263c31}
+.simulator-guide h3{font-size:11px;line-height:16px;font-weight:600;letter-spacing:.8px;margin:24px 0 8px;color:#65786a}
+.simulator-guide p{margin:0}
+.simulator-guide .simulator-guide-summary{color:#65786a}
+.simulator-guide ul{margin:0;padding-left:16px}
+.simulator-guide li{padding-left:3px;margin:0 0 9px}
+.simulator-guide .simulator-guide-pointer{font-size:11px;color:#758477;border-top:1px solid #d4dbd0;padding-top:16px;margin-top:24px}
+.simulator-guided .preview-meta,.simulator-guided.device-only .preview-meta{position:static;left:auto;right:auto;bottom:auto;margin:28px auto 0;text-align:center;font-size:10px;line-height:18px}
+.simulator-shell.is-stacked{grid-template-columns:minmax(0,1fr);gap:28px;max-width:528px}
+.simulator-shell.is-stacked .simulator-guide{padding:24px 4px 0;border-left:0;border-top:1px solid #cbd3c9}
+@media(min-width:960px){html.simulator-guided .workspace{padding-top:100px}.simulator-guided #orbit-s3-preview{padding-top:100px}}
