@@ -1,3 +1,4 @@
+#include <initializer_list>
 #include "intro_ai_worker.h"
 #include "intro_ai_settings.h"
 #include <assert.h>

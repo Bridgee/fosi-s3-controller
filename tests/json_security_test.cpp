@@ -1,3 +1,4 @@
+#include <initializer_list>
 #include "s3_protocol.h"
 #include <assert.h>
 #include <cmath>

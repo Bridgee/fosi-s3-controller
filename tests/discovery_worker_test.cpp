@@ -1,3 +1,4 @@
+#include <initializer_list>
 #include "s3_protocol.h"
 #include "discovery_policy.h"
 #include <assert.h>

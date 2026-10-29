@@ -106,7 +106,7 @@ void serial_tick() {
             command[commandSize]=0;
             if(!overflow){if(!strcmp(command,"IPHONE_STATUS"))print_status();else if(!strcmp(command,"IPHONE_START"))Serial.println(start()?"IPHONE event=queued":"IPHONE rejected=busy_or_cooldown");}
             commandSize=0;overflow=false;
-        }else if(commandSize+1<sizeof(command))command[commandSize++]=char(c);
+        }else if(size_t(commandSize)+1<sizeof(command))command[commandSize++]=char(c);
         else overflow=true;
     }
 #endif

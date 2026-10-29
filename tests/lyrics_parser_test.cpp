@@ -1,3 +1,4 @@
+#include <initializer_list>
 #include "lyrics_protocol.h"
 #include "metadata_text.h"
 #include <assert.h>
@@ -17,7 +18,7 @@ int main(){
     assert(parse("[offset:-500]\n[00:01]First\n[00:02]Next") && d->lines[0].at==1500);
     assert(parse("[00:01]<00:01.0>Word <00:01.5>times\n[00:02]Next") && !strcmp(d->text+d->lines[0].offset,"Word times"));
     assert(parse("\xef\xbb\xbf[ti:Test Song]\r\n[ar:Test Artist]\r\n[00:01]日本語の歌詞\r\n[00:02]中文歌词"));
-    for(const std::string &bad:{"plain lyrics", "[00:99]Bad\n[00:02]Next", "[00:01.0000]Bad\n[00:02]Next", "[00:01]Only one", "[00:00]A\n[00:00]B", "[99:01]Beyond length\n[00:02]Next", "[00:01Unclosed\n[00:02]Next", "[offset:50000]\n[00:01]A\n[00:02]B", "[ti:Wrong song]\n[00:01]A\n[00:02]B"})assert(!parse(bad));
+    for(const char *bad:{"plain lyrics", "[00:99]Bad\n[00:02]Next", "[00:01.0000]Bad\n[00:02]Next", "[00:01]Only one", "[00:00]A\n[00:00]B", "[99:01]Beyond length\n[00:02]Next", "[00:01Unclosed\n[00:02]Next", "[offset:50000]\n[00:01]A\n[00:02]B", "[ti:Wrong song]\n[00:01]A\n[00:02]B"})assert(!parse(bad));
     std::string longLine="[00:01]"+std::string(MaxLineBytes+1,'x')+"\n[00:02]Next";assert(!parse(longLine));
     std::string many;for(unsigned i=0;i<MaxLines+1;++i){char line[64];snprintf(line,sizeof(line),"[%02u:%02u]Sample line\n",i/60,i%60);many+=line;}track.duration=360;assert(!parse(many));track.duration=180;
     assert(!parse(std::string("[00:01]A\0B\n[00:02]Next",23)));assert(!parse("[00:01]\xc0\x80\n[00:02]Next"));assert(!parse("[00:01]\xe2\x80\xae\n[00:02]Next"));

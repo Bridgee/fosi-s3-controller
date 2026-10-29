@@ -1,3 +1,4 @@
+#include <initializer_list>
 #include "intro_ai.h"
 #include <ArduinoJson.h>
 #include <assert.h>

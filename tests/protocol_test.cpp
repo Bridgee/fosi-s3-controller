@@ -1,3 +1,4 @@
+#include <initializer_list>
 #include "s3_protocol.h"
 #include "source_identity.h"
 #include "source_status.h"

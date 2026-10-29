@@ -1,3 +1,5 @@
+#include <initializer_list>
+#include <cstdlib>
 #include "intro_ai_async.h"
 #include "intro_ai_mock.h"
 #include "intro_ai_gate.h"
@@ -129,7 +131,7 @@ int main(){
     NetworkGate gate;CHECK(gate.media()&&!gate.ai());gate.release();CHECK(gate.ai()&&!gate.media());gate.preempt();CHECK(gate.preempted());gate.release();CHECK(gate.ai()&&!gate.preempted());gate.release();
     // Actual concurrent SPSC publication: no lost/torn structs or unbounded growth.
     Queue<Command,2> queue;std::atomic<bool> done{false};std::thread producer([&]{Command c;for(unsigned i=1;i<=20000;++i){c.token=i;c.snapshot.durationSeconds=i;snprintf(c.snapshot.title,sizeof c.snapshot.title,"%u",i);while(!queue.push(c))std::this_thread::yield();}done.store(true);});
-    Command c;unsigned received=0;while(!done.load()||received<20000){if(queue.pop(c)){++received;assert(c.token==received&&c.snapshot.durationSeconds==received&&unsigned(atoi(c.snapshot.title))==received);}else std::this_thread::yield();}producer.join();CHECK(received==20000);
+    Command c;unsigned received=0;while(!done.load()||received<20000){if(queue.pop(c)){++received;assert(c.token==received&&c.snapshot.durationSeconds==received&&unsigned(std::atoi(c.snapshot.title))==received);}else std::this_thread::yield();}producer.join();CHECK(received==20000);
     // Actual UI/worker threads repeatedly replace/cancel requests during parsing.
     r.reset(new Rig);done.store(false);std::thread background([&]{while(!done.load()){r->worker.pump();std::this_thread::yield();}r->worker.shutdown();});
     for(unsigned i=0;i<1200;++i){r->song.topic=Topic(i%3);if(i%11==0){r->ui.trackChanged();snprintf(r->song.title,sizeof r->song.title,"Track %u",i);}r->ui.begin(r->song,r->now());if(i%3==0)r->ui.cancel();r->clock.at.fetch_add(20);r->ui.tick(r->now());if(auto *v=r->ui.result())CHECK(v->text[0]&&v->sourceCount>0);std::this_thread::yield();}

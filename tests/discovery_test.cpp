@@ -1,3 +1,4 @@
+#include <initializer_list>
 #include "discovery_policy.h"
 #include <assert.h>
 #include <string>

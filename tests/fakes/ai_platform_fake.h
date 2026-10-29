@@ -28,7 +28,7 @@ inline int64_t esp_timer_get_time(){return int64_t(fake_ai::ms*1000);}
 inline time_t ai_fake_time(time_t*){return 1793214000;}
 #define time ai_fake_time
 struct FakeWiFi {int status()const{return fake_ai::wifi?WL_CONNECTED:0;}};
-static FakeWiFi WiFi;
+static FakeWiFi WiFi __attribute__((unused));
 namespace orbit_clock {inline bool utc_ready(){return fake_ai::utcSynced;}}
 class IPAddress {public:uint32_t value;explicit IPAddress(uint32_t address):value(address){}};
 using ip_addr_t=fake_ai::FakeIp;

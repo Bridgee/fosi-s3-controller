@@ -1,3 +1,4 @@
+#include <initializer_list>
 #include "iphone_trigger_platform.h"
 #include "iphone_trigger.h"
 #include "network_clock.h"

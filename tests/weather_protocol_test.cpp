@@ -1,3 +1,4 @@
+#include <initializer_list>
 #include "weather_protocol.h"
 #include <assert.h>
 #include <fstream>

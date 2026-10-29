@@ -1,3 +1,4 @@
+#include <initializer_list>
 #include "intro_ai_mock.h"
 #include <assert.h>
 #include <stdio.h>
