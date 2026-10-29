@@ -7,7 +7,31 @@ It runs on the display; it does not replace the S3's firmware.
 
 **[Try the online simulator](https://bridgee.github.io/fosi-s3-controller/?device=player)** — pure simulation, no real API calls or hardware access.
 
-![Native LVGL renders with synthetic data](docs/images/screens.png)
+## Five pages, one controller
+
+![Spatial page map: clock above the player, weather below, AirPlay launch left, reserved page right](docs/images/navigation.png)
+
+From the player, use these gestures: **down for Clock, up for
+Weather, right for AirPlay launch, left for the reserved page**. Reverse the
+swipe to return. A drag that starts on the volume arc adjusts volume instead.
+
+## Inside the player
+
+![Player controls and examples: volume, I/O, artwork, lyrics, music introductions, vinyl and themes](docs/images/player-guide.png)
+
+| Control | Interaction |
+| --- | --- |
+| Volume | Tap the arc or top volume value to open Volume; drag the arc to adjust. |
+| I/O | Select input/output; open About, Theme/brightness or standby. |
+| Artwork | Tap to enlarge; tap again to return. |
+| Vinyl | With no artwork, a rotating record and tonearm follow playback. |
+| Lyrics | A speech-bubble icon appears only after a timed-lyrics match. |
+| Music introductions | Tap the title/artist, then choose Artist, Release or Song. Scroll to the Source list. |
+| Playback and mute | Use the central transport controls and right-hand mute icon. |
+| Connection | Tap the bottom status icon to open About. |
+
+The images use synthetic data. The online simulator's **Bridge Zhao** button
+returns to [the personal homepage](https://bridgee.github.io/).
 
 ## Features
 

@@ -9,7 +9,7 @@ import json
 import shutil
 import tempfile
 import threading
-from build_pages import build, ROOT, CSP, PAGES, selected
+from build_pages import build, ROOT, CSP, PAGES, selected, HOME_LINK
 
 class Resources(HTMLParser):
     def __init__(self): super().__init__(); self.paths=[]; self.policies=[]
@@ -27,6 +27,9 @@ with tempfile.TemporaryDirectory(prefix='fosi-pages-test-') as d:
     for name,sha in manifest['files'].items():assert hashlib.sha256((out/name).read_bytes()).hexdigest()==sha
     for page in PAGES:
         text=(out/page).read_text();parser=Resources();parser.feed(text)
+        assert text.count(HOME_LINK)==1 and 'id="site-navigation-style"' in text
+        assert text.index(HOME_LINK)<text.index('id="screen"')
+        assert 'href="https://bridgee.github.io/"' in HOME_LINK
         assert parser.policies==[CSP] and "connect-src 'none'" in CSP
         assert "form-action 'none'" in CSP and "worker-src 'none'" in CSP and "base-uri 'none'" in CSP
         assert text.index('Content-Security-Policy')<text.index('<style>')<text.index('<script')

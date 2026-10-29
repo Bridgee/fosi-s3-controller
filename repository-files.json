@@ -336,6 +336,8 @@
     "docs/CONFIGURATION.md",
     "docs/DEVELOPMENT.md",
     "docs/PROTOCOL.md",
+    "docs/images/navigation.png",
+    "docs/images/player-guide.png",
     "docs/images/screens.png",
     "firmware/OrbitS3/OrbitS3.ino",
     "firmware/OrbitS3/ai_local.example.h",
