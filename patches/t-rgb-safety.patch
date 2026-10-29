@@ -1,0 +1,42 @@
+diff --git a/src/LilyGo_RGBPanel.cpp b/src/LilyGo_RGBPanel.cpp
+index 2aacc27..dbf5692 100644
+--- a/src/LilyGo_RGBPanel.cpp
++++ b/src/LilyGo_RGBPanel.cpp
+@@ -105,6 +105,10 @@ void LilyGo_RGBPanel::initDevice()
+         log_d("Unable to detect touch type, please use  begin(LilyGo_RGBPanel_Type type, LilyGo_RGBPanel_Color_Order order) to specify the initialization screen type");
+     }
+ 
++    if (!_init_cmd) {
++        Serial.println("Panel initialization sequence unavailable; select the board revision.");
++        return;
++    }
+     initBUS();
+ 
+     getModel();
+@@ -121,7 +125,7 @@ bool LilyGo_RGBPanel::begin(LilyGo_RGBPanel_Color_Order  order)
+ 
+     initDevice();
+ 
+-    return true;
++    return _panelDrv != NULL;
+ }
+ 
+ 
+@@ -137,7 +141,7 @@ bool LilyGo_RGBPanel::begin(LilyGo_RGBPanel_Type type, LilyGo_RGBPanel_Color_Ord
+ 
+     initDevice();
+ 
+-    return true;
++    return _panelDrv != NULL;
+ }
+ 
+ bool LilyGo_RGBPanel::installSD()
+@@ -686,7 +690,7 @@ void LilyGo_RGBPanel::writeData(const uint8_t *data, int len)
+             uint16_t pdat = (*(data + i)) | 1 << 8;
+             extension.transfer9(pdat);
+             i++;
+-        } while (len--);
++        } while (--len);
+     }
+ }
+ 

@@ -1,0 +1,14 @@
+/* Alternate preview frame only; all screen styles come from index.html. */
+#orbit-s3-preview{font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#69776f;width:100%;padding:12px 0 8px;overflow:hidden}
+#orbit-s3-preview .orbit-preview-title{font-size:17px;font-weight:500;margin:0}
+#orbit-s3-preview .orbit-top{display:flex;flex-direction:column;align-items:center;gap:12px;padding-bottom:12px}
+#orbit-s3-preview .modes{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px 20px}
+#orbit-s3-preview .mode{font-size:12px;gap:7px;padding:8px 0}
+#orbit-s3-preview .mode .num,#orbit-s3-preview .mode .dash{display:none}
+#orbit-s3-preview .stage{min-height:0;width:100%;height:auto;overflow:hidden}
+#orbit-s3-preview .device-holder{position:relative;width:100%;height:550px}
+#orbit-s3-preview .device-wrap,.device-only #orbit-s3-preview .device-wrap{position:absolute;top:0;left:50%;width:528px;height:528px;margin:0!important;transform-origin:top center;transform:translateX(-50%) scale(var(--orbit-scale,1))!important}
+#orbit-s3-preview .preview-tools{margin:8px 0 0;gap:14px}
+#orbit-s3-preview .preview-tools button{font-size:11px}
+#orbit-s3-preview .orbit-caption{font-size:11px;text-align:center;margin:12px 0}
+html.device-only body{margin:0}

@@ -1,0 +1,15 @@
+* text=auto
+*.c text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.patch -text
+# Preserve upstream license, exact patch and generated font bytes.
+*.patch -whitespace
+assets/fonts/OFL-*.txt -whitespace
+assets/preview/LICENSE-*.txt -whitespace
+assets/source-icons/CC0-1.0.txt -whitespace
+firmware/OrbitS3/orbit_metadata_*.c -whitespace

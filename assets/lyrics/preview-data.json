@@ -1,0 +1,20 @@
+{
+  "notice": "Original fictional lyrics for offline UI tests; no service requests.",
+  "records": [
+    {
+      "provider": "primary",
+      "trackName": "A Place Between",
+      "artistName": "Northline",
+      "albumName": "Still / Moving",
+      "duration": 258,
+      "instrumental": false,
+      "syncedLyrics": "[00:04]A little light across the room\n[00:12]The city moves beyond the glass\n[00:22]We leave a space between the sounds\n[00:34]And let the quiet moments last\n[00:48]The evening opens like a door\n[01:02]A distant train, a softer sky\n[01:16]There is a place between the notes\n[01:24]Where all the hurried hours pass by\n[01:32]We find a little room to breathe\n[01:40]And let the next light settle in\n[01:54]The road is still beneath our feet\n[02:08]Another place we can begin\n[02:24]No need to hurry through the night\n[02:42]The windows catch the morning blue\n[03:02]We leave a space between the sounds\n[03:24]And watch the daylight coming through\n[03:48]A little light across the room\n[04:10]\n"
+    },
+    {
+      "provider": "fallback",
+      "title": "Soft Landing",
+      "artist": "Northline",
+      "lyrics": "[length:03:44]\n[al:Still / Moving]\n[00:03]Keep the quiet close tonight\n[00:14]Let the corners soften slowly\n[00:28]Small reflections on the wall\n[00:42]Nothing has to move too quickly\n[00:58]Take the long way through the room\n[01:12]Follow where the silence opens\n[01:24]A softer landing, just for now\n[01:38]All the words we left unspoken\n[01:54]Every line can find its rhythm\n[02:14]Every breath can find its place\n[02:38]Let the night arrive around us\n[03:02]Leave a little open space\n[03:30]\n"
+    }
+  ]
+}

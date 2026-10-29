@@ -1,0 +1,101 @@
+/* Canonical480px native layout. Generated assets stay local and API-free. */
+@font-face{font-family:OrbitUi;src:url("assets/preview/Montserrat-Medium.ttf") format("truetype");font-weight:100 900;font-display:swap}
+.screen{font-family:OrbitUi,-apple-system,BlinkMacSystemFont,sans-serif;font-weight:500;letter-spacing:0}
+.screen button{font-family:inherit;font-weight:500}
+.ambient{display:none}
+.track-info{top:284px;left:65px;right:auto;width:350px}
+.track-info h2{font-size:24px;line-height:31px;letter-spacing:0;font-weight:500;margin:0}
+.track-info p{position:absolute;top:32px;left:0;width:350px;font-size:14px;line-height:19px;letter-spacing:0;margin:0}
+.transport .icon-button{padding:0;background:transparent;color:var(--muted)}
+.transport .play{background:var(--accent);color:var(--ink)}
+.progress{left:136px;top:414px;width:208px}
+.time-row{font-size:16px;line-height:18px;margin-top:9px;color:var(--muted)}
+.volume-page .view-label{left:90px;top:110px;right:auto;width:300px;line-height:16px;letter-spacing:0}
+.volume-number{left:90px;top:184px;right:auto;width:300px;font-size:48px;line-height:52px}
+.volume-unit{left:80px;top:274px;right:auto;width:320px;font-size:14px;line-height:16px;letter-spacing:0}
+.volume-actions{left:108px;top:312px;right:auto;width:264px;height:72px}
+.volume-actions button{background:var(--panel);font-size:0;border:1px solid var(--muted);position:relative}
+.volume-actions #minus::before,.volume-actions #plus::before,.volume-actions #plus::after{content:"";position:absolute;left:22px;top:34px;width:26px;height:3px;border-radius:2px;background:currentColor}
+.volume-actions #plus::after{left:34px;top:22px;width:3px;height:26px}
+.volume-actions .mute{font-size:12px;color:var(--fg);border-radius:50%}
+.volume-actions .mute[aria-pressed="false"]{font-size:14px}
+.volume-actions button:disabled{opacity:.7;cursor:default}
+.volume-actions .mute:disabled{opacity:.3}
+.back,.volume-page .back,.route-page .back,.about-page .back,.theme-page .back,.music-intro-page .back{left:164px;top:412px;width:152px;height:52px;line-height:21px;background:transparent;color:var(--fg)}
+.back::after{left:-32px;right:-32px;top:-10px;bottom:-32px}
+.theme-page .back::after{top:-20px}
+.s3-choice,.outputs .s3-choice{height:56px}
+.s3-choice-title{font-size:14px;line-height:16px;font-weight:500}
+.s3-choice-detail{font-size:12px;line-height:15px;font-weight:500}
+.s3-choice[data-output="analog"]>svg{width:26px!important;height:26px!important;min-width:26px;max-width:26px;margin:0}
+.s3-choice::after{content:"";position:absolute;inset:-2px -4px}
+.s3-choice{position:relative;overflow:visible}
+.s3-choice-copy{overflow:hidden}
+#routeSource{line-height:16px}
+.theme-grid{left:92px;top:130px;width:296px;gap:12px 8px;grid-template-columns:repeat(4,68px)}
+.theme-option{height:80px;gap:10px}
+.theme-name{line-height:16px}
+.brightness-row button::after{inset:-2px -4px}
+.about-details dt,.about-details dd{line-height:16px}
+.route-page h2,.theme-page h2,.about-page h2{font-weight:500;line-height:27px}
+.music-intro-subject,.music-read-subject{line-height:31px}
+.music-intro-context{line-height:19px}
+.music-intro-choice{line-height:18px;font-weight:500}
+.music-read-kind{line-height:16px}
+.music-read-viewport{display:flex;flex-direction:column}
+.music-read-body{flex:none;line-height:39px;margin:0 0 16px;font-weight:500;transform:translateY(-4px)}
+.music-source-title{font-size:14px;line-height:19px}
+.music-source-domain{line-height:16px}
+.music-source-tabs{top:338px}
+.music-source-tabs button{color:var(--muted)}
+.music-source-tabs button[aria-current="true"]{color:var(--accent)}
+.music-source-link.qr-source{left:140px;top:138px;width:200px;height:200px;overflow:hidden;text-decoration:none}
+.music-source-link.qr-source img{display:block;width:200px;height:200px}
+.music-source-link.qr-source::after{content:none}
+.native-font-icon{background:currentColor;mask-position:center;mask-repeat:no-repeat;mask-size:100% 100%;-webkit-mask-position:center;-webkit-mask-repeat:no-repeat;-webkit-mask-size:100% 100%;aspect-ratio:auto!important}
+.native-font-icon>*{visibility:hidden}
+.device-status>svg{display:none}
+.native-status-icon{position:absolute;left:28px;top:8px;width:24px;height:24px;background:currentColor;mask-size:24px 24px;mask-repeat:no-repeat;-webkit-mask-size:24px 24px;-webkit-mask-repeat:no-repeat;pointer-events:none}
+.preview-meta{margin:4px auto 0;text-align:center;color:#69776f;font:11px/18px -apple-system,BlinkMacSystemFont,sans-serif}
+.device-only .preview-meta{position:fixed;left:0;right:0;bottom:5px;margin:0;z-index:20;font-size:10px;pointer-events:none}
+
+.status{letter-spacing:0}
+.status>strong{line-height:16px;font-weight:500}
+.volume-number{font-weight:500;letter-spacing:0}
+.volume-page .view-label{font-size:14px}
+.volume-chip{gap:8px}
+.weather-temperature{left:80px;width:320px;line-height:52px}
+.weather-condition{left:50px;width:380px;line-height:21px}
+.weather-details{left:55px;width:370px;line-height:16px}
+.weather-range{left:80px;width:320px;line-height:18px}
+.weather-metric strong{font-weight:500;line-height:22px}
+.weather-metric span{margin-top:6px;line-height:16px}
+.lyrics-row{line-height:31px}
+.lyrics-row.small{line-height:19px}
+.music-read-feedback{line-height:15px}
+.music-read-message{line-height:21px}
+.music-read-loading{left:228px;width:24px;height:24px}
+.music-source-link:not(.qr-source){height:188px;font-size:14px;line-height:16px;color:var(--fg)}
+
+.device-only .orbit-header,.device-only .preview-tools,.device-only .orbit-caption{display:none!important}
+.device-only .device-holder{margin:0}
+
+.volume-actions #minus>svg,.volume-actions #plus>svg{display:none}
+.device-only .orbit-top{display:none!important}
+.device-only .stage{overflow:visible}
+.route-pill span{transform:translateY(1px);line-height:22px}
+
+.s3-choice[data-input="line"]>svg,.s3-choice[data-input="hdmi"]>svg,.s3-choice[data-input="optical"]>svg,.s3-choice[data-output="optical"]>svg{width:20px!important;height:20px!important;min-width:20px;max-width:20px;flex:0 0 20px}
+
+/* Hidden SVGs do not honor the HTML hidden attribute without an explicit rule. */
+.screen [hidden]{display:none!important}
+.screen img,.screen svg{-webkit-user-drag:none;user-select:none}
+
+.music-read-kind{left:80px;width:320px}
+.music-source-list{flex:none;padding:0 0 12px;margin:0}
+.music-source-heading{font-size:16px;line-height:18px;font-weight:500;color:var(--muted);text-align:left;margin:0 0 8px}
+.music-reference{display:grid;grid-template-columns:30px minmax(0,1fr);column-gap:6px;align-items:start;width:304px;min-height:60px;padding:8px 0;margin:0 0 8px;border:0;border-radius:0;background:transparent;color:var(--fg);text-align:left;font-size:14px;font-weight:500;line-height:19px;box-shadow:none}
+.music-reference:last-child{margin-bottom:0}
+.music-reference-number{color:var(--muted);line-height:19px}
+.music-reference-title{display:block;line-height:22px;margin:-1.5px 0;white-space:normal;overflow-wrap:anywhere;min-width:0}
+.music-reference:hover,.music-reference:focus-visible{color:var(--accent)}

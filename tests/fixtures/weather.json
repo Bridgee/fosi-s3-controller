@@ -1,0 +1,38 @@
+{
+  "current_units": {
+    "temperature_2m": "°C",
+    "apparent_temperature": "°C",
+    "relative_humidity_2m": "%",
+    "wind_speed_10m": "km/h",
+    "time": "unixtime"
+  },
+  "daily_units": {
+    "time": "unixtime",
+    "temperature_2m_max": "°C",
+    "temperature_2m_min": "°C",
+    "precipitation_probability_max": "%"
+  },
+  "current": {
+    "time": 1793012400,
+    "temperature_2m": 21.4,
+    "apparent_temperature": 20.2,
+    "relative_humidity_2m": 62,
+    "is_day": 1,
+    "weather_code": 2,
+    "wind_speed_10m": 8.5
+  },
+  "daily": {
+    "time": [
+      1792998000
+    ],
+    "temperature_2m_max": [
+      24.8
+    ],
+    "temperature_2m_min": [
+      16.2
+    ],
+    "precipitation_probability_max": [
+      20
+    ]
+  }
+}

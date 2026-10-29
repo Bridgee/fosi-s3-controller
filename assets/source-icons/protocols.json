@@ -1,0 +1,68 @@
+[
+  {
+    "aliases": [
+      "airplay"
+    ],
+    "label": "AirPlay",
+    "icon": "airplay"
+  },
+  {
+    "aliases": [
+      "spotify",
+      "spotifyconnect"
+    ],
+    "label": "Spotify Connect",
+    "icon": "spotify"
+  },
+  {
+    "aliases": [
+      "googlecast"
+    ],
+    "label": "Google Cast",
+    "icon": "cast"
+  },
+  {
+    "aliases": [
+      "tidal",
+      "tidalconnect"
+    ],
+    "label": "Tidal Connect",
+    "icon": "tidal"
+  },
+  {
+    "aliases": [
+      "qobuz",
+      "qobuzconnect"
+    ],
+    "label": "Qobuz Connect",
+    "icon": "network"
+  },
+  {
+    "aliases": [
+      "roon"
+    ],
+    "label": "Roon",
+    "icon": "roon"
+  },
+  {
+    "aliases": [
+      "upnp"
+    ],
+    "label": "UPnP",
+    "icon": "upnp"
+  },
+  {
+    "aliases": [
+      "dlna"
+    ],
+    "label": "DLNA",
+    "icon": "dlna"
+  },
+  {
+    "aliases": [
+      "bluetooth"
+    ],
+    "label": "Bluetooth",
+    "icon": "bluetooth"
+  }
+]

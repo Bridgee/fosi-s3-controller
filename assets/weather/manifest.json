@@ -1,0 +1,454 @@
+{
+  "design": "Original flat weather symbols following supplied Apple-style references; no outlines/gradients; theme/day palettes",
+  "size": 96,
+  "format": "LV_IMG_CF_INDEXED_4BIT",
+  "count": 37,
+  "nativePixelBytes": 172864,
+  "alternatePaletteBytes": 9472,
+  "icons": [
+    {
+      "enum": "Sun",
+      "id": "clear-day",
+      "label": "Clear sky",
+      "codes": [
+        0
+      ],
+      "kind": "sun",
+      "level": 1,
+      "sky": null,
+      "day": true
+    },
+    {
+      "enum": "Moon",
+      "id": "clear-night",
+      "label": "Clear night",
+      "codes": [
+        0
+      ],
+      "kind": "moon",
+      "level": 1,
+      "sky": null,
+      "day": false
+    },
+    {
+      "enum": "MostlyClearDay",
+      "id": "mostly-clear-day",
+      "label": "Mostly clear \u00b7 day",
+      "codes": [
+        1
+      ],
+      "kind": "small-cloud",
+      "level": 1,
+      "sky": "sun",
+      "day": true
+    },
+    {
+      "enum": "MostlyClearNight",
+      "id": "mostly-clear-night",
+      "label": "Mostly clear \u00b7 night",
+      "codes": [
+        1
+      ],
+      "kind": "small-cloud",
+      "level": 1,
+      "sky": "moon",
+      "day": false
+    },
+    {
+      "enum": "PartlyCloudy",
+      "id": "partly-cloudy-day",
+      "label": "Partly cloudy \u00b7 day",
+      "codes": [
+        2
+      ],
+      "kind": "cloud",
+      "level": 1,
+      "sky": "sun",
+      "day": true
+    },
+    {
+      "enum": "PartlyCloudyNight",
+      "id": "partly-cloudy-night",
+      "label": "Partly cloudy \u00b7 night",
+      "codes": [
+        2
+      ],
+      "kind": "cloud",
+      "level": 1,
+      "sky": "moon",
+      "day": false
+    },
+    {
+      "enum": "Cloud",
+      "id": "overcast",
+      "label": "Overcast",
+      "codes": [
+        3
+      ],
+      "kind": "overcast",
+      "level": 1,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "Fog",
+      "id": "fog",
+      "label": "Fog",
+      "codes": [
+        45
+      ],
+      "kind": "fog",
+      "level": 1,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "RimeFog",
+      "id": "rime-fog",
+      "label": "Rime fog",
+      "codes": [
+        48
+      ],
+      "kind": "rime",
+      "level": 1,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "LightDrizzle",
+      "id": "light-drizzle",
+      "label": "Light drizzle",
+      "codes": [
+        51
+      ],
+      "kind": "drizzle",
+      "level": 1,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "Drizzle",
+      "id": "drizzle",
+      "label": "Drizzle",
+      "codes": [
+        53
+      ],
+      "kind": "drizzle",
+      "level": 2,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "HeavyDrizzle",
+      "id": "dense-drizzle",
+      "label": "Dense drizzle",
+      "codes": [
+        55
+      ],
+      "kind": "drizzle",
+      "level": 3,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "LightFreezingDrizzle",
+      "id": "light-freezing-drizzle",
+      "label": "Light freezing drizzle",
+      "codes": [
+        56
+      ],
+      "kind": "freezing-drizzle",
+      "level": 1,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "FreezingDrizzle",
+      "id": "freezing-drizzle",
+      "label": "Freezing drizzle",
+      "codes": [
+        57
+      ],
+      "kind": "freezing-drizzle",
+      "level": 3,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "LightRain",
+      "id": "light-rain",
+      "label": "Light rain",
+      "codes": [
+        61
+      ],
+      "kind": "rain",
+      "level": 1,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "Rain",
+      "id": "rain",
+      "label": "Rain",
+      "codes": [
+        63
+      ],
+      "kind": "rain",
+      "level": 2,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "HeavyRain",
+      "id": "heavy-rain",
+      "label": "Heavy rain",
+      "codes": [
+        65
+      ],
+      "kind": "rain",
+      "level": 3,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "LightFreezingRain",
+      "id": "light-freezing-rain",
+      "label": "Light freezing rain",
+      "codes": [
+        66
+      ],
+      "kind": "freezing-rain",
+      "level": 1,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "FreezingRain",
+      "id": "freezing-rain",
+      "label": "Freezing rain",
+      "codes": [
+        67
+      ],
+      "kind": "freezing-rain",
+      "level": 3,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "LightSnow",
+      "id": "light-snow",
+      "label": "Light snow",
+      "codes": [
+        71
+      ],
+      "kind": "snow",
+      "level": 1,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "Snow",
+      "id": "snow",
+      "label": "Snow",
+      "codes": [
+        73
+      ],
+      "kind": "snow",
+      "level": 2,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "HeavySnow",
+      "id": "heavy-snow",
+      "label": "Heavy snow",
+      "codes": [
+        75
+      ],
+      "kind": "snow",
+      "level": 3,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "SnowGrains",
+      "id": "snow-grains",
+      "label": "Snow grains",
+      "codes": [
+        77
+      ],
+      "kind": "grains",
+      "level": 2,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "LightShowersDay",
+      "id": "light-showers-day",
+      "label": "Light showers \u00b7 day",
+      "codes": [
+        80
+      ],
+      "kind": "rain",
+      "level": 1,
+      "sky": "sun",
+      "day": true
+    },
+    {
+      "enum": "LightShowersNight",
+      "id": "light-showers-night",
+      "label": "Light showers \u00b7 night",
+      "codes": [
+        80
+      ],
+      "kind": "rain",
+      "level": 1,
+      "sky": "moon",
+      "day": false
+    },
+    {
+      "enum": "ShowersDay",
+      "id": "showers-day",
+      "label": "Rain showers \u00b7 day",
+      "codes": [
+        81
+      ],
+      "kind": "rain",
+      "level": 2,
+      "sky": "sun",
+      "day": true
+    },
+    {
+      "enum": "ShowersNight",
+      "id": "showers-night",
+      "label": "Rain showers \u00b7 night",
+      "codes": [
+        81
+      ],
+      "kind": "rain",
+      "level": 2,
+      "sky": "moon",
+      "day": false
+    },
+    {
+      "enum": "HeavyShowersDay",
+      "id": "heavy-showers-day",
+      "label": "Heavy showers \u00b7 day",
+      "codes": [
+        82
+      ],
+      "kind": "rain",
+      "level": 3,
+      "sky": "sun",
+      "day": true
+    },
+    {
+      "enum": "HeavyShowersNight",
+      "id": "heavy-showers-night",
+      "label": "Heavy showers \u00b7 night",
+      "codes": [
+        82
+      ],
+      "kind": "rain",
+      "level": 3,
+      "sky": "moon",
+      "day": false
+    },
+    {
+      "enum": "SnowShowersDay",
+      "id": "snow-showers-day",
+      "label": "Snow showers \u00b7 day",
+      "codes": [
+        85
+      ],
+      "kind": "snow",
+      "level": 1,
+      "sky": "sun",
+      "day": true
+    },
+    {
+      "enum": "SnowShowersNight",
+      "id": "snow-showers-night",
+      "label": "Snow showers \u00b7 night",
+      "codes": [
+        85
+      ],
+      "kind": "snow",
+      "level": 1,
+      "sky": "moon",
+      "day": false
+    },
+    {
+      "enum": "HeavySnowShowersDay",
+      "id": "heavy-snow-showers-day",
+      "label": "Heavy snow showers \u00b7 day",
+      "codes": [
+        86
+      ],
+      "kind": "snow",
+      "level": 3,
+      "sky": "sun",
+      "day": true
+    },
+    {
+      "enum": "HeavySnowShowersNight",
+      "id": "heavy-snow-showers-night",
+      "label": "Heavy snow showers \u00b7 night",
+      "codes": [
+        86
+      ],
+      "kind": "snow",
+      "level": 3,
+      "sky": "moon",
+      "day": false
+    },
+    {
+      "enum": "Thunder",
+      "id": "thunderstorm",
+      "label": "Thunderstorm",
+      "codes": [
+        95
+      ],
+      "kind": "thunder",
+      "level": 1,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "Hail",
+      "id": "thunder-hail",
+      "label": "Thunder with hail",
+      "codes": [
+        96
+      ],
+      "kind": "hail",
+      "level": 1,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "HeavyThunder",
+      "id": "heavy-thunderstorm",
+      "label": "Heavy thunderstorm",
+      "codes": [
+        97
+      ],
+      "kind": "thunder",
+      "level": 3,
+      "sky": null,
+      "day": null
+    },
+    {
+      "enum": "HeavyHail",
+      "id": "heavy-thunder-hail",
+      "label": "Thunder with heavy hail",
+      "codes": [
+        99
+      ],
+      "kind": "hail",
+      "level": 3,
+      "sky": null,
+      "day": null
+    }
+  ]
+}

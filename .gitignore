@@ -1,0 +1,29 @@
+# Private settings and credentials
+**/*_local.h
+.env
+.env.*
+!.env.example
+*.key
+*.p12
+*.pfx
+# Build/dependency caches
+.deps/
+.pio/
+.pio-core/
+.venv/
+__pycache__/
+*.pyc
+# Machine files and generated outputs
+.DS_Store
+.vscode/
+.idea/
+*.bin
+*.elf
+*.map
+*.o
+*.log
+*.zip
+
+# Local LVGL renders and Arduino preprocessing output
+/artifacts/
+**/*.ino.cpp

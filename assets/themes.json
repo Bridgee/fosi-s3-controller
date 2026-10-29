@@ -1,0 +1,165 @@
+[
+  {
+    "id": "sage",
+    "name": "Green",
+    "label": "Green",
+    "colors": [
+      "0d1515",
+      "e6eeea",
+      "8d9f97",
+      "c6dfcb",
+      "2b3734",
+      "17221d",
+      "15241d",
+      "193225",
+      "9bcead",
+      "90a699",
+      "84a891",
+      "b0c8b3",
+      "274536"
+    ]
+  },
+  {
+    "id": "amber",
+    "name": "Orange",
+    "label": "Orange",
+    "colors": [
+      "19130f",
+      "f4ece3",
+      "b4a18e",
+      "f3c18d",
+      "40332a",
+      "2a2018",
+      "302317",
+      "3f2814",
+      "e7a866",
+      "baa083",
+      "bb8b58",
+      "d9b88f",
+      "583715"
+    ]
+  },
+  {
+    "id": "glacier",
+    "name": "Blue",
+    "label": "Blue",
+    "colors": [
+      "10161c",
+      "e6eef5",
+      "92a6b8",
+      "bedcf2",
+      "2a3946",
+      "19242f",
+      "172838",
+      "193347",
+      "91bedf",
+      "92afc3",
+      "7ca4bf",
+      "b0cddd",
+      "24475f"
+    ]
+  },
+  {
+    "id": "moon",
+    "name": "Gray",
+    "label": "Gray",
+    "colors": [
+      "141417",
+      "eeeeF2",
+      "a0a0ad",
+      "d5d4e1",
+      "35353e",
+      "222228",
+      "25252e",
+      "2d2c39",
+      "b9b6cf",
+      "a6a3b8",
+      "9692ad",
+      "c5c1d5",
+      "403c53"
+    ]
+  },
+  {
+    "id": "red",
+    "name": "Red",
+    "label": "Red",
+    "colors": [
+      "1c1214",
+      "f5e9e8",
+      "b6a0a1",
+      "efb8b4",
+      "453035",
+      "2b1d20",
+      "322025",
+      "4a2328",
+      "df8f8b",
+      "bc9999",
+      "b37577",
+      "ddb1ad",
+      "3b181e"
+    ]
+  },
+  {
+    "id": "cream",
+    "name": "Cream",
+    "label": "Cream",
+    "swatch": "f1e9d7",
+    "colors": [
+      "f1e9d7",
+      "332c21",
+      "5c5142",
+      "765b31",
+      "c6baa3",
+      "e1d8c3",
+      "ded3bc",
+      "fff9ec",
+      "846633",
+      "8b7454",
+      "d4bb88",
+      "9b8154",
+      "654718"
+    ]
+  },
+  {
+    "id": "ice",
+    "name": "Ice",
+    "label": "Ice",
+    "swatch": "e7edf1",
+    "colors": [
+      "e7edf1",
+      "223440",
+      "435965",
+      "365f79",
+      "b0bec8",
+      "d5dfe6",
+      "cbd9e3",
+      "f6fbff",
+      "466f87",
+      "5f7d8f",
+      "acc8d9",
+      "718e9f",
+      "24485f"
+    ]
+  },
+  {
+    "id": "white",
+    "name": "White",
+    "label": "White",
+    "colors": [
+      "e8e6de",
+      "26332e",
+      "4d5851",
+      "3d6252",
+      "b4bbb3",
+      "dadcd3",
+      "d0d8cd",
+      "f5f3ea",
+      "507663",
+      "687f6e",
+      "afc6b5",
+      "789581",
+      "2b4837"
+    ],
+    "swatch": "e8e6de"
+  }
+]

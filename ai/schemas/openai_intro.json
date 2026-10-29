@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "properties": {
+    "status": {"type": "string", "enum": ["ready", "ambiguous", "not_found", "insufficient_evidence"]},
+    "subject": {"type": "string"},
+    "release_type": {"type": "string", "enum": ["album", "ep", "single", "compilation", "other", "unknown"]},
+    "paragraphs": {"type": "array", "items": {
+      "type": "object", "properties": {
+        "text": {"type": "string"},
+        "source_urls": {"type": "array", "items": {"type": "string"}}
+      }, "required": ["text", "source_urls"], "additionalProperties": false
+    }}
+  },
+  "required": ["status", "subject", "release_type", "paragraphs"],
+  "additionalProperties": false
+}

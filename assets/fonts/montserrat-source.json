@@ -1,0 +1,15 @@
+{
+  "url": "https://raw.githubusercontent.com/lvgl/lvgl/v8.4.0/scripts/built_in_font/Montserrat-Medium.ttf",
+  "gitBlobSha": "6e079f6984098cc53f68a24390936a73a6dcd944",
+  "sha256": "421f26b23e2be6b98373d32acd3cb2897b154d4bf0a77d26534ce476e4cbed53",
+  "version": "7.200",
+  "sourceRelease": "LVGL v8.4.0",
+  "copyright": "Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)",
+  "converterVersion": "1.5.3",
+  "ranges": "0xA0-0x17F,0x1E9E,0x2010-0x2027,0x20AC",
+  "bpp": 4,
+  "sizes": [
+    24,
+    14
+  ]
+}

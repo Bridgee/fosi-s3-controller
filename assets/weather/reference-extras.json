@@ -1,0 +1,114 @@
+{
+  "purpose": "Supplemental original reference-family artwork; no unreported live conditions inferred",
+  "embeddedInFirmware": false,
+  "icons": [
+    {
+      "id": "breezy",
+      "label": "Breezy"
+    },
+    {
+      "id": "blowing-snow",
+      "label": "Blowing snow"
+    },
+    {
+      "id": "blizzard",
+      "label": "Blizzard"
+    },
+    {
+      "id": "sleet",
+      "label": "Sleet"
+    },
+    {
+      "id": "mixed-rainfall",
+      "label": "Mixed rainfall"
+    },
+    {
+      "id": "scattered-thunderstorm",
+      "label": "Scattered thunderstorm"
+    },
+    {
+      "id": "blizzard-night",
+      "label": "Blizzard \u00b7 night"
+    },
+    {
+      "id": "sleet-night",
+      "label": "Sleet \u00b7 night"
+    },
+    {
+      "id": "mixed-rainfall-night",
+      "label": "Mixed rainfall \u00b7 night"
+    },
+    {
+      "id": "scattered-thunderstorm-night",
+      "label": "Scattered thunderstorm \u00b7 night"
+    },
+    {
+      "id": "drizzle-night",
+      "label": "Drizzle \u00b7 night"
+    },
+    {
+      "id": "rain-night",
+      "label": "Rain \u00b7 night"
+    },
+    {
+      "id": "heavy-rain-night",
+      "label": "Heavy rain \u00b7 night"
+    },
+    {
+      "id": "fog-night",
+      "label": "Fog \u00b7 night"
+    },
+    {
+      "id": "hail-night",
+      "label": "Hail \u00b7 night"
+    },
+    {
+      "id": "mostly-cloudy-night",
+      "label": "Mostly cloudy \u00b7 night"
+    },
+    {
+      "id": "haze",
+      "label": "Haze"
+    },
+    {
+      "id": "dust",
+      "label": "Dust"
+    },
+    {
+      "id": "smoke",
+      "label": "Smoke"
+    },
+    {
+      "id": "sunrise",
+      "label": "Sunrise"
+    },
+    {
+      "id": "sunset",
+      "label": "Sunset"
+    },
+    {
+      "id": "hot",
+      "label": "Hot"
+    },
+    {
+      "id": "ice",
+      "label": "Ice"
+    },
+    {
+      "id": "tornado",
+      "label": "Tornado"
+    },
+    {
+      "id": "hurricane",
+      "label": "Hurricane"
+    },
+    {
+      "id": "tropical-storm",
+      "label": "Tropical storm"
+    },
+    {
+      "id": "no-report",
+      "label": "No report"
+    }
+  ]
+}

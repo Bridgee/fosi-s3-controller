@@ -1,0 +1,46 @@
+{
+  "id": "resp_offline_fixture",
+  "object": "response",
+  "status": "completed",
+  "error": null,
+  "incomplete_details": null,
+  "output": [
+    {
+      "type": "web_search_call",
+      "id": "ws_fixture",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "Example Song Example Artist recording",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://example.org/music/song",
+            "title": "Synthetic recording fixture"
+          }
+        ]
+      }
+    },
+    {
+      "type": "message",
+      "id": "msg_fixture",
+      "role": "assistant",
+      "status": "completed",
+      "content": [
+        {
+          "type": "output_text",
+          "text": "{\"status\":\"ready\",\"subject\":\"Example Song\",\"release_type\":\"unknown\",\"paragraphs\":[{\"text\":\"This synthetic song is part of a fictional recording used to test the short introduction reader. The supplied example source identifies its performer and recording context.\",\"source_urls\":[\"https://example.org/music/song\"]},{\"text\":\"A second short paragraph checks continuous reading and paragraph references. This fixture makes no factual claims about a real artist or release.\",\"source_urls\":[\"https://example.org/music/song\"]}]}",
+          "annotations": [
+            {
+              "type": "url_citation",
+              "url": "https://example.org/music/song",
+              "title": "Synthetic recording fixture",
+              "start_index": 0,
+              "end_index": 10
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

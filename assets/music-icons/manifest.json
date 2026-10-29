@@ -1,0 +1,48 @@
+{
+  "design": "Original person/album-cover/musical-note vector family; refined curves/optical proportions; no third-party glyph source",
+  "totalPixelBytes": 3072,
+  "icons": [
+    {
+      "id": "artist",
+      "side": 32,
+      "format": "LV_IMG_CF_ALPHA_8BIT",
+      "pixelBytes": 1024,
+      "alphaSha256": "2240081d698feefe9b83b0da4aa211c9cae012b1d2e26bcfaceb0a1b898f1a12",
+      "svgSha256": "5b64bf317e27e934fb850f8229d3a81668b153407b0c2efe286584aca0535749",
+      "inkBox": [
+        1,
+        1,
+        31,
+        31
+      ]
+    },
+    {
+      "id": "album",
+      "side": 32,
+      "format": "LV_IMG_CF_ALPHA_8BIT",
+      "pixelBytes": 1024,
+      "alphaSha256": "cf7b8306d3dc03bdcf9a373b5b2f9068e7a0f2049a7c8667be1b17a8dec872dc",
+      "svgSha256": "86bb2946fe7ad512893436997ccd5a6d968837712c60ef8fe43e94f84371926c",
+      "inkBox": [
+        1,
+        1,
+        31,
+        31
+      ]
+    },
+    {
+      "id": "song",
+      "side": 32,
+      "format": "LV_IMG_CF_ALPHA_8BIT",
+      "pixelBytes": 1024,
+      "alphaSha256": "be3a27c7f2f8a9a5acf583c4121498ad4f965a1bdea1b32ca01f73177837e1c1",
+      "svgSha256": "8c3bdaefe293f113627ad322a7ecba6cdc15c5ebe9cd166d0613a5ca29e81777",
+      "inkBox": [
+        3,
+        1,
+        30,
+        31
+      ]
+    }
+  ]
+}
