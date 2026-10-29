@@ -30,7 +30,7 @@ swipe to return. A drag that starts on the volume arc adjusts volume instead.
 | Playback and mute | Use the central transport controls and right-hand mute icon. |
 | Connection | Tap the bottom status icon to open About. |
 
-The images use synthetic data. The online simulator's **Bridge Zhao** button
+The images use synthetic data. The online simulator's **My homepage** button
 returns to [the personal homepage](https://bridgee.github.io/).
 
 ## Features

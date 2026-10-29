@@ -17,7 +17,7 @@ EXTRA = {"assets/clock/pixel-glyphs.js", "assets/timezones/rules.js",
          "assets/fonts/OFL-Montserrat.txt", "assets/fonts/OFL-NotoSansCJK.txt",
          "assets/fonts/UNICODE-DATA-LICENSE.txt", "assets/source-icons/CC0-1.0.txt",
          "LICENSE", "THIRD_PARTY_NOTICES.md"}
-HOME_LINK = '<a class="site-home" href="https://bridgee.github.io/" aria-label="Back to Bridge Zhao home"><span aria-hidden="true">&#8592;</span> Bridge Zhao</a>'
+HOME_LINK = '<a class="site-home" href="https://bridgee.github.io/" aria-label="Go to my homepage"><span aria-hidden="true">&#8592;</span> My homepage</a>'
 HOME_STYLE = """<style id="site-navigation-style">
 .site-home{position:fixed;top:max(16px,env(safe-area-inset-top));left:max(16px,env(safe-area-inset-left));z-index:40;display:inline-flex;align-items:center;gap:9px;padding:11px 15px;min-height:44px;border:1px solid #cbd1c8;border-radius:24px;background:#eeefeaed;color:#344b40;font:500 13px/20px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;backdrop-filter:blur(8px)}
 .site-home:hover{background:#fff;color:#193b2a;border-color:#8ea395}
