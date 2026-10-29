@@ -575,7 +575,8 @@ bool send(Action action,int value) {
     }
     if(powerInFlight.load())return false;
     const bool accepted=action==Action::Volume?xQueueOverwrite(volumes,&command)==pdTRUE:xQueueSend(commands,&command,0)==pdTRUE;
-    if(accepted)orbit_intro_async::preemptAi();return accepted;
+    if(accepted) {orbit_intro_async::preemptAi();}
+    return accepted;
 }
 bool receiveArtwork(Artwork &artwork) {
     return artworks && xQueueReceive(artworks,&artwork,0)==pdTRUE;

@@ -35,7 +35,8 @@ int main(){
  assert(calls.size()>=4&&calls[0]==0&&calls[1]==15000&&calls[2]==16000&&calls[3]==31000);
  assert(revisions[0]==1&&revisions[2]==2);
  clockNow=started=0xfffff000u;stopAt=900000;fresh=true;replacement=false;calls.clear();revisions.clear();run();
- for(auto &v:calls)v-=started;assert(calls==expected);
+ for(auto &v:calls){v-=started;}
+ assert(calls==expected);
  clockNow=started=0;fresh=true;successOnSecond=true;calls.clear();revisions.clear();run();assert(calls.size()==2);
  puts("PASS: actual media loop failed-cover backoff capped at5min; new artwork immediate, success stops retry, millis wrap");
 }
