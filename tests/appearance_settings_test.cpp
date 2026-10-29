@@ -21,8 +21,11 @@ int main() {
     // Truncation, future versions, invalid brightness and missing NUL all use safe defaults.
     for(unsigned bad=0;bad<5;++bad) {
         auto record=good;
-        if(bad==0)record.pop_back();if(bad==1)record[0]=9;if(bad==2)record[1]=0;
-        if(bad==3)record[1]=17;if(bad==4)for(unsigned i=2;i<record.size();++i)record[i]='x';
+        if(bad==0) {record.pop_back();}
+        if(bad==1) {record[0]=9;}
+        if(bad==2) {record[1]=0;}
+        if(bad==3) {record[1]=17;}
+        if(bad==4) {for(unsigned i=2;i<record.size();++i) {record[i]='x';}}
         store.values["orbit-ui/appearance"]=record;begin(2);assert(theme()==2 && brightness()==12);
     }
     auto retired=good;memset(retired.data()+2,0,16);memcpy(retired.data()+2,"retired",7);

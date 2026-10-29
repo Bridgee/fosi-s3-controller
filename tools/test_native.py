@@ -15,7 +15,16 @@ TESTS = (
     "test_build_guard.py",
 )
 if __name__ == "__main__":
+    failures = []
     for name in TESTS:
         print("Running " + name, flush=True)
-        subprocess.run([sys.executable, str(ROOT / "tools" / name)], cwd=ROOT, check=True, timeout=180)
+        try:
+            result = subprocess.run([sys.executable, str(ROOT / "tools" / name)], cwd=ROOT, timeout=180)
+            if result.returncode: failures.append(name)
+        except subprocess.TimeoutExpired:
+            print("FAIL: suite timed out: " + name, flush=True)
+            failures.append(name)
+    if failures:
+        print("FAIL: " + ", ".join(failures), flush=True)
+        raise SystemExit(1)
     print(f"PASS: {len(TESTS)} offline regression suites")

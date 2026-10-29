@@ -52,7 +52,9 @@ int main() {
     // Unknown duration, physical line input or unknown player never extrapolate.
     for(int mode=0;mode<3;++mode) {
         PlaybackProgress q;Snapshot a=playing(1000);
-        if(mode==0)a.duration=0;if(mode==1)a.input=2;if(mode==2)a.playerKnown=false;
+        if(mode==0) {a.duration=0;}
+        if(mode==1) {a.input=2;}
+        if(mode==2) {a.playerKnown=false;}
         q.observe(Snapshot{},a,1000);assert(!q.known());
     }
     // Bluetooth can supply metadata/position too, when available.
