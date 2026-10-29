@@ -27,3 +27,6 @@ __pycache__/
 # Local LVGL renders and Arduino preprocessing output
 /artifacts/
 **/*.ino.cpp
+
+# Static Pages deployment output
+/_site/

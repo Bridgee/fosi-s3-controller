@@ -3,6 +3,7 @@
   "files": [
     ".gitattributes",
     ".github/workflows/ci.yml",
+    ".github/workflows/pages.yml",
     ".gitignore",
     "LICENSE",
     "README.md",
@@ -481,6 +482,7 @@
     "tests/weather_worker_test.cpp",
     "tests/wifi_recovery_test.cpp",
     "tools/build_guard.py",
+    "tools/build_pages.py",
     "tools/check_repository.py",
     "tools/generate_intro_ai_contract.py",
     "tools/prepare.py",
@@ -503,6 +505,7 @@
     "tools/test_lyrics.py",
     "tools/test_music_intro.cjs",
     "tools/test_native.py",
+    "tools/test_pages.py",
     "tools/test_playback_progress.py",
     "tools/test_preview_lyrics.cjs",
     "tools/test_preview_lyrics.py",

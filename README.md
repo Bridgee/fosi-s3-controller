@@ -5,6 +5,8 @@ A round-screen controller for the **Fosi Audio S3**, built for the **LilyGO T-RG
 Fosi S3 Controller is an independent community project, not official Fosi or LilyGO firmware.
 It runs on the display; it does not replace the S3's firmware.
 
+**[Try the online simulator](https://bridgee.github.io/fosi-s3-controller/?device=player)** — pure simulation, no real API calls or hardware access.
+
 ![Native LVGL renders with synthetic data](docs/images/screens.png)
 
 ## Features

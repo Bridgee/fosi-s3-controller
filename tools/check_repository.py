@@ -8,7 +8,7 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "repository-files.json"
-IGNORED_DIRS = {".git", ".deps", ".pio", ".pio-core", ".venv", "__pycache__", ".vscode", ".idea", "artifacts"}
+IGNORED_DIRS = {".git", ".deps", ".pio", ".pio-core", ".venv", "__pycache__", ".vscode", ".idea", "artifacts", "_site"}
 PATTERNS = {
     "provider token": re.compile(r"\b(?:sk-[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})"),
     "private key": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
