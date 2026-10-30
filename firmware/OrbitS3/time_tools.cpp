@@ -19,7 +19,8 @@ bool valid(const Record &r){return r.version==2 && r.checksum==hash(r) && r.enab
 bool commit(){const auto b=bank();if(hasCommitted && !memcmp(&b,&committed,sizeof(b)))return true;Preferences p;if(!p.begin("orbit-time",false))return false;bool ok=p.putBytes("settings",&b,sizeof(b))==sizeof(b);p.end();if(ok){committed=b;hasCommitted=true;}return ok;}
 }
 void begin(){
- for(auto &engine:engines)engine=Engine{};committed=bank();hasCommitted=true;Preferences p;if(!p.begin("orbit-time",true))return;
+ for(auto &engine:engines){engine=Engine{};}
+ committed=bank();hasCommitted=true;Preferences p;if(!p.begin("orbit-time",true))return;
  const auto size=p.getBytesLength("settings");Bank b={};bool ok=false;unsigned count=1;
  if(size==sizeof(Bank)){ok=p.getBytes("settings",&b,sizeof(b))==sizeof(b) && b.version==3 && b.count==Slots && !b.reserved[0] && !b.reserved[1] && b.checksum==hash(b);count=Slots;}
  else if(size==sizeof(Record)){ok=p.getBytes("settings",&b.slots[0],sizeof(Record))==sizeof(Record);}

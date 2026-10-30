@@ -264,7 +264,7 @@
   "inputs": {
     "firmware/OrbitS3/firmware_version.h": "00cf2730c3d7c0c6111742446de63d4928e7eb4ca2ed61595d1b1faf09360add",
     "firmware/OrbitS3/time_tools.h": "5a86380d5f6e27c1f112d8fbfa8776c61251306725998dcb8f744e22dc9eacec",
-    "firmware/OrbitS3/time_tools.cpp": "45f2896746d1121dfbbcf5005997b620e226c676d251792ab15408372cf7cd48",
+    "firmware/OrbitS3/time_tools.cpp": "b9519a21bacc81cbbb4619b19d843c0b618649c64b6d836bd35e900d668d721d",
     "firmware/OrbitS3/orbit_display.cpp": "13a274d2059686515a4be74baa0f712147efb1f68f78515c444bba624f04939a",
     "firmware/OrbitS3/orbit_display.h": "2468c3220461ef617c05ca1fc325e93036d1b0ffcfd25b300685b8435ec87a80",
     "firmware/OrbitS3/screen_idle.h": "b62f65491ff24dccd763501fa374fce099a03a21c949f10f0d59c7e9a771a611",

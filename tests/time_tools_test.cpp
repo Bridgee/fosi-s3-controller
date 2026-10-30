@@ -46,7 +46,8 @@ int main(){
  dismiss();assert(!alerts()&&state(0).remaining()==2&&state(1).timer()==Timer::Running);
  tick(4000,empty);assert(timer_mask()==2);dismiss();pause(4100,2);auto paused=state(2).remaining();tick(6000,empty);assert(timer_mask()==8&&state(2).remaining()==paused);dismiss();assert(prefs.writes==writes);
  start(6000,2);tick(7000,empty);assert(timer_mask()==4);dismiss();
- for(unsigned i=0;i<Slots;++i)assert(alarm(8,15,true,i));tick(8000,wall(20261101,8,15));assert(alarm_mask()==15&&alerts()==Alarm);dismiss();tick(9000,wall(20261101,8,15));assert(!alerts());begin();tick(10000,wall(20261101,8,15));assert(!alerts());
+ for(unsigned i=0;i<Slots;++i){assert(alarm(8,15,true,i));}
+ tick(8000,wall(20261101,8,15));assert(alarm_mask()==15&&alerts()==Alarm);dismiss();tick(9000,wall(20261101,8,15));assert(!alerts());begin();tick(10000,wall(20261101,8,15));assert(!alerts());
  for(unsigned i=0;i<Slots;++i){assert(state(i).config().enabled&&state(i).config().hour==8&&state(i).config().seconds==2+i);assert(state(i).timer()==Timer::Idle);}
  assert(!alarm(1,0,true,4)&&!preset(1,4));n=prefs.writes;start(0,4);pause(0,4);reset(4);assert(prefs.writes==n);
  // A saved bank cannot partially restore a corrupt second slot.
