@@ -18,12 +18,16 @@ EXTRA = {"assets/preview/guide.js", "assets/preview/guide.css", "assets/clock/pi
          "assets/fonts/UNICODE-DATA-LICENSE.txt", "assets/source-icons/CC0-1.0.txt",
          "LICENSE", "THIRD_PARTY_NOTICES.md"}
 HOME_LINK = '<a class="site-home" href="https://bridgee.github.io/" aria-label="Go to my homepage"><span aria-hidden="true">&#8592;</span> My homepage</a>'
-HOME_STYLE = """<style id="site-navigation-style">
-.site-home{position:fixed;top:max(16px,env(safe-area-inset-top));left:max(16px,env(safe-area-inset-left));z-index:40;display:inline-flex;align-items:center;gap:9px;padding:11px 15px;min-height:44px;border:1px solid #cbd1c8;border-radius:24px;background:#eeefeaed;color:#344b40;font:500 13px/20px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;backdrop-filter:blur(8px)}
-html:not(.device-only) .site-home{position:static;margin:16px 6% 0}
-.site-home:hover{background:#fff;color:#193b2a;border-color:#8ea395}
-.site-home:focus-visible{outline:2px solid #3d6252;outline-offset:4px}
-@media(max-height:600px){.site-home{top:8px;left:8px;padding:8px 12px}}
+REPO_LINK = '<a class="site-repository" href="https://github.com/Bridgee/fosi-s3-controller" aria-label="Go to project repository"><span aria-hidden="true">&#8599;</span> Project repo</a>'
+NAVIGATION_LINKS = '<nav class="site-navigation" aria-label="Project navigation">' + HOME_LINK + REPO_LINK + '</nav>'
+NAVIGATION_STYLE = """<style id="site-navigation-style">
+.site-navigation{position:fixed;top:max(16px,env(safe-area-inset-top));left:max(16px,env(safe-area-inset-left));z-index:40;display:flex;align-items:center;flex-wrap:wrap;gap:8px;max-width:calc(100vw - 32px);pointer-events:none}
+.site-navigation a{display:inline-flex;align-items:center;gap:9px;padding:11px 15px;min-height:44px;border:1px solid #cbd1c8;border-radius:24px;background:#eeefeaed;color:#344b40;font:500 13px/20px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;backdrop-filter:blur(8px);pointer-events:auto;white-space:nowrap}
+html:not(.device-only) .site-navigation{position:static;margin:16px 6% 0}
+.site-navigation a:hover{background:#fff;color:#193b2a;border-color:#8ea395}
+.site-navigation a:focus-visible{outline:2px solid #3d6252;outline-offset:4px}
+@media(max-width:480px){.site-navigation a{padding:9px 11px;gap:7px;font-size:12px}}
+@media(max-height:600px){.site-navigation{top:8px;left:8px}.site-navigation a{padding:8px 12px}}
 </style>"""
 WEB_SUFFIXES = {".js", ".css", ".svg", ".png", ".ttf", ".woff", ".woff2", ".txt"}
 NETWORK_OR_DEVICE = re.compile(
@@ -85,8 +89,8 @@ def build(destination, root=ROOT):
                     raise ValueError("Unexpected page head; CSP must precede resources")
                 # Hosting navigation lives outside the simulated display. A regular link
                 # leaves the simulation only on an explicit click; connect-src stays none.
-                text = text.replace('</head>', HOME_STYLE + '</head>', 1)
-                text = text.replace('<body>', '<body>' + HOME_LINK, 1)
+                text = text.replace('</head>', NAVIGATION_STYLE + '</head>', 1)
+                text = text.replace('<body>', '<body>' + NAVIGATION_LINKS, 1)
                 data = text.encode("utf-8")
         payload[name] = data
     manifest = {"mode":"offline_simulation", "networkApis":False, "deviceAccess":False,

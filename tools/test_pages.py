@@ -9,7 +9,7 @@ import json
 import shutil
 import tempfile
 import threading
-from build_pages import build, ROOT, CSP, PAGES, selected, HOME_LINK
+from build_pages import build, ROOT, CSP, PAGES, selected, HOME_LINK, REPO_LINK, NAVIGATION_LINKS
 
 class Resources(HTMLParser):
     def __init__(self): super().__init__(); self.paths=[]; self.policies=[]
@@ -29,6 +29,11 @@ with tempfile.TemporaryDirectory(prefix='fosi-pages-test-') as d:
     for page in PAGES:
         text=(out/page).read_text();parser=Resources();parser.feed(text)
         assert text.count(HOME_LINK)==1 and 'id="site-navigation-style"' in text
+        assert text.count(REPO_LINK)==1 and text.count(NAVIGATION_LINKS)==1
+        assert text.index(NAVIGATION_LINKS)<text.index('id="screen"')
+        assert 'href="https://github.com/Bridgee/fosi-s3-controller"' in REPO_LINK
+        assert 'aria-label="Project navigation"' in NAVIGATION_LINKS
+        assert 'flex-wrap:wrap' in text and 'min-height:44px' in text
         assert text.index(HOME_LINK)<text.index('id="screen"')
         assert 'href="https://bridgee.github.io/"' in HOME_LINK
         assert parser.policies==[CSP] and "connect-src 'none'" in CSP
