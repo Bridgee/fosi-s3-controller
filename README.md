@@ -36,8 +36,7 @@ Alerts light the display and flash until STOP. The idle clock dims and stays vis
 | Playback and mute | Use the central transport controls and right-hand mute icon. |
 | Connection | Tap the bottom status icon to open About. |
 
-The images use synthetic data. The online simulator's **My homepage** button
-returns to [the personal homepage](https://bridgee.github.io/).
+The images use synthetic data.
 
 ## Features
 
