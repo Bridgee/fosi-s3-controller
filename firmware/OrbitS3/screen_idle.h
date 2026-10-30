@@ -1,8 +1,8 @@
 #pragma once
 #include <stdint.h>
 
-// Touch inactivity clock. Only an explicit local reading view can inhibit sleep;
-// network/media updates never wake the display.
+// Touch inactivity clock. An idle clock may stay visible at low backlight;
+// its first touch is still wake-only. Network/media updates never reset inactivity.
 namespace orbit_display {
 class ScreenIdle {
 public:

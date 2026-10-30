@@ -26,7 +26,8 @@ assert.equal(selectGuide({view:'blank-up',standby:true,vinyl:true}).key,'blank-u
 assert.equal(selectGuide({view:'lyrics',artwork:true}).key,'lyrics');
 assert.equal(selectGuide({view:'__proto__'}).key,'player');
 assert.equal(selectGuide({view:'unrecognized'}).key,'player');
-assert.equal(selectGuide({view:'intro-read'}).key,'intro-read');count+=9;
+assert.equal(selectGuide({view:'intro-read'}).key,'intro-read');
+assert.equal(selectGuide({view:'blank-up',dimmed:true}).key,'dimmed');count+=10;
 assert(guides['blank-up'].navigation.includes('Swipe up'));
 assert(guides['blank-down'].navigation.includes('Swipe down'));
 assert(guides['blank-left'].navigation.includes('Swipe left'));

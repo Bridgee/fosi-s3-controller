@@ -1,0 +1,21 @@
+{
+  "description": "Golden public metrics and bitmap bytes for every BMP codepoint, captured before storage-only packing; FNV-1a64 with each scalar mixed as four little-endian bytes.",
+  "fonts": {
+    "orbit_metadata_24": {
+      "fnv1a64": "0252d37f9ea170d8",
+      "glyphs": 21793
+    },
+    "orbit_metadata_12": {
+      "fnv1a64": "91f5f248aedfbb3a",
+      "glyphs": 21793
+    },
+    "orbit_metadata_latin_24": {
+      "fnv1a64": "2a7579fe260d031a",
+      "glyphs": 241
+    },
+    "orbit_metadata_latin_14": {
+      "fnv1a64": "1bc5f61d740b5f42",
+      "glyphs": 241
+    }
+  }
+}

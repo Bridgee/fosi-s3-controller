@@ -16,8 +16,9 @@ lv_disp_drv_t displayDriver;
 lv_indev_drv_t touchDriver;
 lv_disp_t *registeredDisplay=nullptr;
 orbit_display::ScreenIdle screenIdle(ORBIT_SCREEN_IDLE_MS);
-bool screenAwake=true;
+bool screenAwake=true,screenDimmed=false;
 uint8_t savedBrightness=12;
+uint8_t idleBrightness(){return savedBrightness>=8?2:1;}
 void flush(lv_disp_drv_t *driver,const lv_area_t *area,lv_color_t *pixels) {
     static_cast<LilyGo_RGBPanel*>(driver->user_data)->pushColors(
         area->x1,area->y1,area->x2+1,area->y2+1,reinterpret_cast<uint16_t*>(pixels));
@@ -39,7 +40,7 @@ bool orbit_display_begin(LilyGo_RGBPanel &panel) {
     auto *buffer=static_cast<lv_color_t*>(heap_caps_malloc(pixels*sizeof(lv_color_t),MALLOC_CAP_SPIRAM|MALLOC_CAP_8BIT));
     if(!buffer) return false;
     lv_init();
-    screenIdle.begin(lv_tick_get());screenAwake=true;
+    screenIdle.begin(lv_tick_get());screenAwake=true;screenDimmed=false;
     lv_disp_draw_buf_init(&drawBuffer,buffer,nullptr,pixels);
     lv_disp_drv_init(&displayDriver);
     displayDriver.hor_res=480;displayDriver.ver_res=480;
@@ -59,32 +60,37 @@ uint8_t orbit_display_brightness(){return savedBrightness;}
 void orbit_display_set_brightness(uint8_t level) {
     savedBrightness=level<1?1:(level>16?16:level);
     if(registeredDisplay && screenAwake)
-        static_cast<LilyGo_RGBPanel*>(displayDriver.user_data)->setBrightness(savedBrightness);
+        static_cast<LilyGo_RGBPanel*>(displayDriver.user_data)->setBrightness(screenDimmed?idleBrightness():savedBrightness);
 }
 bool orbit_display_awake() {return screenAwake;}
+bool orbit_display_dimmed() {return screenDimmed;}
 void orbit_display_tick() {
     if(!registeredDisplay)return;
     const auto now=lv_tick_get();
     if(orbit_ui_alert_active())screenIdle.wake(now);
     if(orbit_ui_keep_screen_on())screenIdle.keep_awake(now);
     screenIdle.poll(now);
-    const bool awake=screenIdle.awake();
-    if(awake==screenAwake)return;
+    // Inactive is still a wake-only contact state. The clock keeps painting,
+    // so its one-second updates and visual alarm checks continue while dimmed.
+    const bool dimmed=!screenIdle.awake() && orbit_ui_dim_when_idle();
+    const bool awake=screenIdle.awake() || dimmed;
+    if(awake==screenAwake && dimmed==screenDimmed)return;
     auto *panel=static_cast<LilyGo_RGBPanel*>(displayDriver.user_data);
     if(!awake) {
-        savedBrightness=panel->getBrightness();
         panel->setBrightness(0);
-        // Invalidation (e.g. label scrolling) would otherwise resume the refresh timer.
         lv_disp_enable_invalidation(registeredDisplay,false);
         lv_timer_pause(registeredDisplay->refr_timer);
         orbit_ui_set_screen_awake(false);
-    } else {
-        // Refresh latest cached state while dark, then restore the saved backlight.
+    } else if(!screenAwake) {
+        // Refresh latest cached state while dark, then restore the backlight.
         lv_disp_enable_invalidation(registeredDisplay,true);
         orbit_ui_set_screen_awake(true);
         lv_timer_resume(registeredDisplay->refr_timer);
         lv_obj_invalidate(lv_scr_act());lv_refr_now(registeredDisplay);
-        panel->setBrightness(savedBrightness);
+        panel->setBrightness(dimmed?idleBrightness():savedBrightness);
+    } else {
+        panel->setBrightness(dimmed?idleBrightness():savedBrightness);
     }
-    screenAwake=awake;
+    // Never copy the temporary dim/zero level into the user's saved setting.
+    screenAwake=awake;screenDimmed=dimmed;
 }

@@ -8,8 +8,11 @@
 // Obtain the appropriate CA chain independently before enabling live requests.
 // The local tests intentionally do not contact OpenAI to inspect its certificate.
 #define ORBIT_AI_CA_CERT ""
-// Example PEM syntax (public CA content only):
-// #define ORBIT_AI_CA_CERT R"PEM(-----BEGIN CERTIFICATE-----
-// ...reviewed public root CA...
-// -----END CERTIFICATE-----
-// )PEM"
+/* Portable PEM syntax: replace the empty macro above with verified public roots.
+   Keep the backslash after each continued macro line and explicit newline escapes.
+
+#define ORBIT_AI_CA_CERT \
+    "-----BEGIN CERTIFICATE-----\n" \
+    "...verified base64 data...\n" \
+    "-----END CERTIFICATE-----\n"
+*/

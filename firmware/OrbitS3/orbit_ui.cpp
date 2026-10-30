@@ -52,7 +52,7 @@ enum View { PLAYER, VOLUME, ROUTING, THEME, ABOUT, LYRICS, INTRO, INTRO_READ, IN
 bool blank_view(View v){return (v>=BLANK_UP && v<=BLANK_RIGHT) || v==ALARM_EDIT || v==TIMER_EDIT || v==CLOCK_ALERT;}
 enum Action { SHOW_VOLUME=1, SHOW_ROUTES, BACK, PLAY, PREVIOUS, NEXT,
               MUTE, MINUS, PLUS, SHOW_THEME, THEME_BACK, SHOW_ABOUT, ABOUT_BACK, POWER_STANDBY, POWER_WAKE, ARTWORK_TOGGLE, BRIGHTNESS_MINUS, BRIGHTNESS_PLUS, LAUNCH_IPHONE,
-              INPUT_BASE=20, OUTPUT_BASE=40, THEME_BASE=60, SHOW_LYRICS=80, CLOSE_LYRICS=81, CLOCK_TIME=90,CLOCK_ALARM,CLOCK_TIMER,ALARM_TOGGLE,EDIT_HOUR,EDIT_MINUTE,EDIT_MINUS,EDIT_PLUS,ALARM_SAVE,ALARM_DRAFT_TOGGLE,TIMER_RUN,TIMER_RESET,ALERT_STOP, SHOW_INTRO=110, INTRO_BACK, INTRO_TOPIC_BASE, INTRO_RETRY=118, INTRO_SOURCE_BACK=120, INTRO_SOURCE_BASE=124 };
+              INPUT_BASE=20, OUTPUT_BASE=40, THEME_BASE=60, SHOW_LYRICS=80, CLOSE_LYRICS=81, CLOCK_TIME=90,CLOCK_ALARM,CLOCK_TIMER,ALARM_TOGGLE,EDIT_HOUR,EDIT_MINUTE,EDIT_MINUS,EDIT_PLUS,ALARM_SAVE,ALERT_STOP, SHOW_INTRO=110, INTRO_BACK, INTRO_TOPIC_BASE, INTRO_RETRY=118, INTRO_SOURCE_BACK=120, INTRO_SOURCE_BASE=124, CLOCK_SLOT_BASE=140, CLOCK_RESET=148 };
 struct Track { const char *title; const char *artist; const char *album; int duration; bool has_cover; };
 const Track tracks[]={{"A Place Between","Northline","Still / Moving",258,true},
                       {"Soft Landing","Northline","Still / Moving",224,false},
@@ -93,31 +93,25 @@ lv_obj_t *about_values[8], *about_status;
 lv_obj_t *standby_button,*wake_button,*home_io;
 lv_obj_t *about_input_key;
 constexpr uint32_t PIXEL_YELLOW=0xffe64a;
-lv_obj_t *clock_date,*clock_zone,*clock_status,*clock_time,*clock_seconds,*clock_alarm_caption,*clock_alarm_value,*clock_alarm_toggle;
-lv_obj_t *alarm_fields[2],*timer_fields[2],*edit_selection[2],*alarm_draft_toggle,*timer_run,*clock_alert_title;
+lv_obj_t *clock_date,*clock_zone,*clock_status,*clock_time,*clock_seconds,*clock_alarm_value,*clock_alarm_toggle,*clock_timer_reset,*clock_slots[8];
+lv_obj_t *alarm_fields[2],*timer_fields[2],*edit_selection[2],*clock_edit_titles[2],*clock_save_buttons[2],*clock_alert_title,*clock_alert_rows[2];
 lv_obj_t *clock_save_hint[2],*edit_minus[2],*edit_plus[2];
-unsigned alarm_hour=7,alarm_minute=30,edit_field[2]={0,0};bool alarm_enabled=false;
-uint32_t clock_poll_at=0;orbit_clock::Reading alarm_wall;
+unsigned alarm_hour=7,alarm_minute=30,timer_draft=300,clock_slot=0,edit_field[2]={0,0};
+uint32_t clock_poll_at=0,clock_alert_since=0;bool clock_alert_dim=false;orbit_clock::Reading alarm_wall;
 
 orbit_clock::Reading clock_reading;
-lv_obj_t *intro_entry,*intro_subject,*intro_context,*intro_choices[3],*intro_read_subject,*intro_read_kind,*intro_body,*intro_viewport;
+lv_obj_t *intro_entry,*intro_subject,*intro_context,*intro_choices[3],*intro_read_subject,*intro_read_kind,*intro_body,*intro_viewport,*intro_message;
 struct IntroContext {char title[160]={},artist[160]={},album[160]={};uint32_t duration=0;} intro_context_data;
 unsigned intro_topic=0;
 #if ORBIT_INTRO_ASYNC
 orbit_intro_async::UiClient *intro_client=nullptr;
-lv_obj_t *intro_loading,*intro_message,*intro_retry,*intro_feedback;
+lv_obj_t *intro_loading,*intro_retry,*intro_feedback;
 lv_obj_t *intro_source_heading,*intro_paragraph2,*intro_references[4],*intro_reference_titles[4],*intro_source_title,*intro_source_domain,*intro_qr,*intro_source_tabs[4],*intro_source_error;
 uint8_t *intro_qr_data=nullptr;
 unsigned intro_source_index=0;
 uint32_t intro_frame=~0u,intro_wait=~0u;
 #endif
 const char *intro_names[]={"Artist","Release","Song"};
-// Explicit layout previews, never generated biography/facts about a real artist.
-const char *intro_copy[3]={
-"A short portrait of the artist or band: their background, influences, and sound.\n\nThe people and ideas behind the music, told in a few clear paragraphs.\n\nA useful introduction adds a little context, then leaves room for listening. It can point to a recording, a collaboration, or a turning point worth hearing for yourself.",
-"The context of this release: its setting, sound, and place in the artist's work.\n\nAn album, EP, single, or live recording can capture a different moment in an artist's work.\n\nA short introduction can explore the recording, its performances, and the ideas that connect it to the music around it.",
-"The story of this song: its sound, writing, and the details worth listening for.\n\nA closer listen to the words, instruments, and moments that make it distinctive.\n\nA brief introduction can offer another way into the recording. The aim is to add context without interrupting the music or turning a small screen into a long essay."
-};
 lv_obj_t *lyrics_button,*lyrics_viewport,*lyrics_rows[5];
 orbit_lyrics::Document *lyrics_document=nullptr;
 uint32_t lyrics_generation=0;int lyrics_cursor=-999;unsigned lyrics_theme=~0u;
@@ -272,15 +266,39 @@ lv_obj_t *button(lv_obj_t *parent,const char *text,int x,int y,int w,int h,
     lv_obj_add_event_cb(o,click,LV_EVENT_CLICKED,reinterpret_cast<void*>(static_cast<intptr_t>(action)));
     return o;
 }
-lv_obj_t *pixel_label(lv_obj_t *parent,const char *value,int x,int y,int w,const lv_font_t *font=&orbit_pixel_21){return label(parent,value,x,y,w,font,PIXEL_YELLOW);}
-void pixel_hit(lv_event_t *event){auto *hit=static_cast<lv_hit_test_info_t*>(lv_event_get_param(event));if(!hit->res)return;auto *o=lv_event_get_target(event);lv_area_t a;lv_obj_get_coords(o,&a);const int h=lv_obj_get_height(o),pad=h<60?(60-h)/2:0,xpad=h==36?0:4;const int x=hit->point->x,y=hit->point->y;hit->res=x>=a.x1-xpad && x<=a.x2+xpad && y>=a.y1-pad && y<=a.y2+pad && (x-240)*(x-240)+(y-240)*(y-240)<=240*240;}
+// The physical 3px matrix is anchored to each clock page, including when it slides.
+// Only the current dirty clip is shaded: no framebuffer, image or per-cell objects.
+void pixel_grid_draw(lv_event_t *event){
+    auto *ctx=lv_event_get_draw_ctx(event);lv_area_t page,clip;
+    lv_obj_get_coords(lv_event_get_target(event),&page);
+    if(!_lv_area_intersect(&clip,&page,ctx->clip_area))return;
+    const int pitch=orbit_pixel_grid::Pitch;
+    lv_draw_rect_dsc_t d;lv_draw_rect_dsc_init(&d);d.bg_color=lv_color_black();d.bg_opa=LV_OPA_10;
+    const int firstX=clip.x1+((page.x1+pitch-1-clip.x1)%pitch+pitch)%pitch;
+    const int firstY=clip.y1+((page.y1+pitch-1-clip.y1)%pitch+pitch)%pitch;
+    for(int x=firstX;x<=clip.x2;x+=pitch){lv_area_t a={lv_coord_t(x),clip.y1,lv_coord_t(x),clip.y2};lv_draw_rect(ctx,&d,&a);}
+    for(int y=firstY;y<=clip.y2;y+=pitch){lv_area_t a={clip.x1,lv_coord_t(y),clip.x2,lv_coord_t(y)};lv_draw_rect(ctx,&d,&a);}
+}
+lv_obj_t *pixel_label(lv_obj_t *parent,const char *value,int x,int y,int w,const lv_font_t *font=&orbit_pixel_21){return label(parent,value,orbit_pixel_grid::snap(x),orbit_pixel_grid::snap(y),orbit_pixel_grid::extent(w),font,PIXEL_YELLOW);}
+void pixel_center(lv_obj_t *b){
+    auto *t=lv_obj_get_child(b,0);const auto *font=lv_obj_get_style_text_font(t,0);
+    const int border=lv_obj_get_style_border_width(b,0);
+    lv_obj_set_width(t,lv_obj_get_style_width(b,0)-2*border);
+    lv_obj_set_align(t,LV_ALIGN_TOP_LEFT);
+    lv_obj_set_pos(t,0,orbit_pixel_grid::snap((lv_obj_get_style_height(b,0)-2*border-font->line_height)/2));
+}
+void pixel_hit(lv_event_t *event){auto *hit=static_cast<lv_hit_test_info_t*>(lv_event_get_param(event));if(!hit->res)return;auto *o=lv_event_get_target(event);lv_area_t a;lv_obj_get_coords(o,&a);bool slot=false;for(auto *b:clock_slots)slot|=o==b;const bool clockControl=o==clock_alarm_value||o==clock_alarm_toggle||o==clock_timer_reset;const int h=lv_obj_get_height(o),pad=slot||clockControl?3:h<60?(60-h)/2:0,xpad=slot?6:h==36?0:4;const int x=hit->point->x,y=hit->point->y;hit->res=x>=a.x1-xpad && x<=a.x2+xpad && y>=a.y1-pad && y<=a.y2+pad && (x-240)*(x-240)+(y-240)*(y-240)<=240*240;}
 lv_obj_t *pixel_button(lv_obj_t *parent,const char *value,int x,int y,int w,int h,int action,const lv_font_t *font=&orbit_pixel_21){
-    auto *b=button(parent,value,x,y,w,h,action,0x000000);lv_obj_set_style_radius(b,0,0);lv_obj_set_style_bg_opa(b,LV_OPA_TRANSP,0);lv_obj_set_style_bg_opa(b,LV_OPA_COVER,LV_STATE_PRESSED);lv_obj_set_style_bg_color(b,lv_color_hex(0x37300b),LV_STATE_PRESSED);lv_obj_set_ext_click_area(b,12);lv_obj_add_flag(b,LV_OBJ_FLAG_ADV_HITTEST);lv_obj_add_event_cb(b,pixel_hit,LV_EVENT_HIT_TEST,nullptr);
-    auto *t=lv_obj_get_child(b,0);lv_obj_set_style_text_font(t,font,0);lv_obj_set_style_text_color(t,lv_color_hex(PIXEL_YELLOW),0);lv_obj_center(t);return b;
+    auto *b=button(parent,value,orbit_pixel_grid::snap(x),orbit_pixel_grid::snap(y),orbit_pixel_grid::extent(w),((h+3)/6)*6,action,0x000000);lv_obj_set_style_radius(b,0,0);lv_obj_set_style_bg_opa(b,LV_OPA_TRANSP,0);lv_obj_set_style_bg_opa(b,LV_OPA_COVER,LV_STATE_PRESSED);lv_obj_set_style_bg_color(b,lv_color_hex(0x37300b),LV_STATE_PRESSED);lv_obj_set_ext_click_area(b,12);lv_obj_add_flag(b,LV_OBJ_FLAG_ADV_HITTEST);lv_obj_add_event_cb(b,pixel_hit,LV_EVENT_HIT_TEST,nullptr);
+    auto *t=lv_obj_get_child(b,0);lv_obj_set_style_text_font(t,font,0);lv_obj_set_style_text_color(t,lv_color_hex(PIXEL_YELLOW),0);pixel_center(b);return b;
 }
 void pixel_selected(lv_obj_t *b,bool yes){lv_obj_set_style_bg_color(b,lv_color_hex(yes?PIXEL_YELLOW:0x000000),0);lv_obj_set_style_bg_opa(b,yes?LV_OPA_COVER:LV_OPA_TRANSP,0);lv_obj_set_style_text_color(lv_obj_get_child(b,0),lv_color_hex(yes?0x000000:PIXEL_YELLOW),0);}
-void pixel_button_text(lv_obj_t *b,const char *value){text(lv_obj_get_child(b,0),value);lv_obj_center(lv_obj_get_child(b,0));}
-void clock_tabs(lv_obj_t *page,int active){const char *names[]={"TIME","ALRM","TMR"};const int actions[]={CLOCK_TIME,CLOCK_ALARM,CLOCK_TIMER};for(int i=0;i<3;++i){auto *b=pixel_button(page,names[i],104+92*i,400,88,36,actions[i]);pixel_selected(b,i==active);}}
+void pixel_button_text(lv_obj_t *b,const char *value){text(lv_obj_get_child(b,0),value);pixel_center(b);}
+void clock_back(lv_obj_t *page){pixel_button(page,"BACK",180,400,120,36,CLOCK_TIME);}
+void clock_slot_label(char *out,unsigned slot){snprintf(out,4,"%c%u",slot<4?'A':'T',slot%4+1);}
+void clock_alert_list(lv_obj_t *label,uint8_t mask,char prefix){char out[16]={};unsigned n=0;for(unsigned i=0;i<4;++i)if(mask&(1u<<i))n+=snprintf(out+n,sizeof(out)-n,"%s%c%u",n?" ":"",prefix,i+1);text(label,out);}
+
+void clock_alert_emphasis(bool dim){for(auto *label:{clock_alert_title,clock_alert_rows[0],clock_alert_rows[1]})lv_obj_set_style_text_opa(label,dim?LV_OPA_50:LV_OPA_COVER,0);}
 
 bool has_cover() {
     if(sleeping())return false;
@@ -563,12 +581,13 @@ void render_intro(){
     if(state.view!=INTRO_READ)return;
     const bool identify=intro_topic==1 && intro_needs_release_identification();
     text(intro_read_kind,intro_names[intro_topic]);
-    text(intro_read_subject,identify?intro_context_data.title:intro_topic_subject(intro_topic));
+    const char *capturedSubject=identify?intro_context_data.title:intro_topic_subject(intro_topic);
 #if ORBIT_INTRO_ASYNC
     using orbit_intro_ai::Outcome;
     const auto outcome=intro_client?intro_client->outcome():orbit_intro_runtime::startupOutcome();
     const auto *value=intro_client?intro_client->result():nullptr;
     const bool ready=outcome==Outcome::Ready,pending=outcome==Outcome::Pending;
+    text(intro_read_subject,orbit_intro_ai::readingSubject(identify,capturedSubject,ready&&value?value->subject:nullptr));
     hidden(intro_viewport,!ready);hidden(intro_loading,!pending);hidden(intro_message,ready);
     hidden(intro_source_heading,!ready || !value || !value->sourceCount);
     if(value){
@@ -610,7 +629,9 @@ void render_intro(){
     intro_frame=lv_tick_get()/150;
     if(pending){lv_img_set_src(intro_loading,orbit_status::icon_image(orbit_status::Icon::Waiting,(lv_tick_get()/150)%orbit_status::FrameCount));lv_obj_set_style_img_recolor(intro_loading,themed_color(GREEN),0);}
 #else
-    text(intro_body,identify?"Release not identified.":intro_copy[intro_topic]);
+    text(intro_read_subject,capturedSubject);
+    hidden(intro_viewport,true);text(intro_body,"");
+    text(intro_message,"Introductions are off");hidden(intro_message,false);
 #endif
 }
 #if ORBIT_INTRO_ASYNC
@@ -912,7 +933,9 @@ void page_slide_ready(lv_anim_t *animation) {
     }
 }
 void show(View v) {
-    if(v==ALARM_EDIT && state.view!=ALARM_EDIT){auto c=orbit_time::state().config();alarm_hour=c.hour;alarm_minute=c.minute;alarm_enabled=c.enabled;edit_field[0]=0;}
+    if(v==CLOCK_ALERT && state.view!=CLOCK_ALERT){clock_alert_since=lv_tick_get();clock_alert_dim=false;clock_alert_emphasis(false);}
+    if(v==ALARM_EDIT && state.view!=ALARM_EDIT){auto c=orbit_time::state(clock_slot%4).config();alarm_hour=c.hour;alarm_minute=c.minute;edit_field[0]=0;}
+    if(v==TIMER_EDIT && state.view!=TIMER_EDIT){timer_draft=orbit_time::state(clock_slot%4).config().seconds;edit_field[1]=0;}
     stop_intro_motion();
 #if ORBIT_INTRO_ASYNC
     if(intro_reader(state.view) && !intro_reader(v) && intro_client)intro_client->cancel();
@@ -977,21 +1000,21 @@ void click(lv_event_t *e) {
     if(slide_page || slide_contact_blocked)return;
     const int a=static_cast<int>(reinterpret_cast<intptr_t>(lv_event_get_user_data(e)));
     if(a==CLOCK_TIME){show(BLANK_UP);return;}
-    if(a==CLOCK_ALARM){show(ALARM_EDIT);return;}
+    if(a>=CLOCK_SLOT_BASE && a<CLOCK_SLOT_BASE+8){clock_slot=a-CLOCK_SLOT_BASE;render();return;}
+    if(a==CLOCK_ALARM){show(clock_slot<4?ALARM_EDIT:TIMER_EDIT);return;}
     if(a==CLOCK_TIMER){show(TIMER_EDIT);return;}
-    if(a==ALARM_TOGGLE){auto c=orbit_time::state().config();orbit_time::alarm(c.hour,c.minute,!c.enabled);render();return;}
-    if(a==ALARM_SAVE){if(orbit_time::alarm(alarm_hour,alarm_minute,alarm_enabled))show(BLANK_UP);else render();return;}
-    if(a==ALARM_DRAFT_TOGGLE){alarm_enabled=!alarm_enabled;render();return;}
+    if(a==ALARM_TOGGLE){auto c=orbit_time::state(clock_slot%4).config();if(clock_slot<4)orbit_time::alarm(c.hour,c.minute,!c.enabled,clock_slot);else if(orbit_time::state(clock_slot%4).timer()==orbit_time::Timer::Running)orbit_time::pause(lv_tick_get(),clock_slot%4);else orbit_time::start(lv_tick_get(),clock_slot%4);render();return;}
+    if(a==CLOCK_RESET){if(clock_slot>=4)orbit_time::reset(clock_slot%4);render();return;}
+    if(a==ALARM_SAVE){const unsigned slot=clock_slot%4;bool ok=state.view==TIMER_EDIT?orbit_time::preset(timer_draft,slot):orbit_time::alarm(alarm_hour,alarm_minute,orbit_time::state(slot).config().enabled,slot);if(ok)show(BLANK_UP);else render();return;}
     if(a==ALERT_STOP){orbit_time::dismiss();show(BLANK_UP);return;}
     if(a==EDIT_HOUR || a==EDIT_MINUTE){edit_field[state.view==TIMER_EDIT?1:0]=a==EDIT_MINUTE?1:0;render();return;}
     if(a==EDIT_MINUS || a==EDIT_PLUS){
         const int delta=a==EDIT_PLUS?1:-1;
         if(state.view==ALARM_EDIT){if(edit_field[0])alarm_minute=(alarm_minute+60+delta)%60;else alarm_hour=(alarm_hour+24+delta)%24;}
-        if(state.view==TIMER_EDIT && orbit_time::state().timer()!=orbit_time::Timer::Running){int seconds=int(orbit_time::state().remaining())+delta*(edit_field[1]?1:60);if(seconds<1)seconds=1;if(seconds>5999)seconds=5999;orbit_time::preset(unsigned(seconds));}
+        if(state.view==TIMER_EDIT && orbit_time::state(clock_slot%4).timer()!=orbit_time::Timer::Running){int seconds=int(timer_draft)+delta*(edit_field[1]?1:60);if(seconds<1)seconds=1;if(seconds>5999)seconds=5999;timer_draft=unsigned(seconds);}
         render();return;
     }
-    if(a==TIMER_RUN){if(orbit_time::state().timer()==orbit_time::Timer::Running)orbit_time::pause(lv_tick_get());else orbit_time::start(lv_tick_get());render();return;}
-    if(a==TIMER_RESET){orbit_time::reset();render();return;}
+
     if(a==SHOW_INTRO){if(intro_available()){capture_intro();show(INTRO);}return;}
 #if ORBIT_INTRO_ASYNC
     if(a==INTRO_SOURCE_BACK){show(INTRO_READ);return;}
@@ -1132,25 +1155,33 @@ void render_lyrics(){
 }
 void render_clock() {
     if(!screen_awake || slide_page)return;
-    char buffer[64];const auto &tools=orbit_time::state();const auto c=tools.config();
-    if(state.view==CLOCK_ALERT){text(clock_alert_title,tools.alerts()==3?"ALRM + TMR":tools.alerts()&orbit_time::Alarm?"ALARM":"TIMER DONE");return;}
+    char buffer[64];const auto &tools=orbit_time::state(clock_slot%4);const auto c=tools.config();
+    if(state.view==CLOCK_ALERT){text(clock_alert_title,orbit_time::alerts()==3?"ALRM + TMR":orbit_time::alerts()&orbit_time::Alarm?"ALARM":"TIMER DONE");clock_alert_list(clock_alert_rows[0],orbit_time::alarm_mask(),'A');clock_alert_list(clock_alert_rows[1],orbit_time::timer_mask(),'T');return;}
     if(state.view==ALARM_EDIT || state.view==TIMER_EDIT){
-        const bool timer=state.view==TIMER_EDIT;unsigned first=timer?tools.remaining()/60:alarm_hour,second=timer?tools.remaining()%60:alarm_minute;
+        const bool timer=state.view==TIMER_EDIT;unsigned first=timer?timer_draft/60:alarm_hour,second=timer?timer_draft%60:alarm_minute;
+        snprintf(buffer,sizeof(buffer),"%c%u %s",timer?'T':'A',clock_slot%4+1,timer?"TIMER":"ALARM");text(clock_edit_titles[timer?1:0],buffer);
         auto **fields=timer?timer_fields:alarm_fields;snprintf(buffer,sizeof(buffer),"%02u",first);pixel_button_text(fields[0],buffer);snprintf(buffer,sizeof(buffer),"%02u",second);pixel_button_text(fields[1],buffer);
-        const unsigned index=timer?1:0;for(unsigned i=0;i<2;++i)lv_obj_set_style_border_width(fields[i],edit_field[index]==i?3:0,LV_PART_MAIN);
+        const unsigned index=timer?1:0;for(unsigned i=0;i<2;++i){lv_obj_set_style_border_width(fields[i],edit_field[index]==i?3:0,LV_PART_MAIN);pixel_center(fields[i]);}
         text(edit_selection[index],edit_field[index]?(timer?"SECOND":"MINUTE"):(timer?"MINUTE":"HOUR"));text(clock_save_hint[index],orbit_time::saved()?"":"NOT SAVED");
-        if(timer){const bool running=tools.timer()==orbit_time::Timer::Running;pixel_button_text(timer_run,running?"PAUSE":tools.timer()==orbit_time::Timer::Paused?"RESUME":"START");for(auto *b:timer_fields)enabled(b,!running);enabled(edit_minus[1],!running);enabled(edit_plus[1],!running);}
-        else {pixel_button_text(alarm_draft_toggle,alarm_enabled?"ON":"OFF");pixel_selected(alarm_draft_toggle,alarm_enabled);}
+        const bool running=timer && tools.timer()==orbit_time::Timer::Running;
+        for(auto *b:{fields[0],fields[1]})enabled(b,!running);enabled(edit_minus[index],!running);enabled(edit_plus[index],!running);enabled(clock_save_buttons[index],!running);
+        if(running)text(clock_save_hint[index],"PAUSE TO EDIT");
         return;
     }
     if(state.view!=BLANK_UP)return;
     clock_reading=orbit_clock::read();const bool ready=clock_reading.status==orbit_clock::Status::Ready && clock_reading.hour<24 && clock_reading.minute<60 && clock_reading.second<60 && clock_reading.day>=1 && clock_reading.day<=31 && clock_reading.month>=1 && clock_reading.month<=12 && clock_reading.weekday<7;
     if(ready){static const char *days[]={"SUN","MON","TUE","WED","THU","FRI","SAT"};static const char *months[]={"JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"};snprintf(buffer,sizeof(buffer),"%s %02u %s",days[clock_reading.weekday],unsigned(clock_reading.day),months[clock_reading.month-1]);text(clock_date,buffer);snprintf(buffer,sizeof(buffer),"%02u:%02u",unsigned(clock_reading.hour),unsigned(clock_reading.minute));text(clock_time,buffer);snprintf(buffer,sizeof(buffer),"%02u",unsigned(clock_reading.second));text(clock_seconds,buffer);text(clock_zone,clock_reading.zone);}else{text(clock_date,"");text(clock_time,"--:--");text(clock_seconds,"--");text(clock_zone,"");}
     text(clock_status,!orbit_time::saved()?"NOT SAVED":ready?"":clock_reading.status==orbit_clock::Status::Offline?"CONNECT TO WI-FI":clock_reading.status==orbit_clock::Status::Locating?"FINDING LOCATION":"SYNCING TIME");
-    text(clock_alarm_caption,c.enabled?"NEXT ALARM":"ALARM OFF");
-    auto *value=lv_obj_get_child(clock_alarm_value,0);lv_obj_set_style_text_font(value,c.enabled?&orbit_pixel_50:&orbit_pixel_21,0);
-    if(c.enabled)snprintf(buffer,sizeof(buffer),"%02u:%02u",unsigned(c.hour),unsigned(c.minute));else strcpy(buffer,"SET ALARM");pixel_button_text(clock_alarm_value,buffer);
-    pixel_button_text(clock_alarm_toggle,c.enabled?"ON":"OFF");pixel_selected(clock_alarm_toggle,c.enabled);
+    const bool timer=clock_slot>=4;const unsigned value=tools.remaining();
+    snprintf(buffer,sizeof(buffer),"%02u:%02u",timer?value/60:unsigned(c.hour),timer?value%60:unsigned(c.minute));pixel_button_text(clock_alarm_value,buffer);
+    hidden(clock_timer_reset,!timer);
+    // Keep time fixed; action widths share the same text padding and center.
+    const int actionWidth=timer?(tools.timer()==orbit_time::Timer::Running?72:90):(c.enabled?54:72);
+    lv_obj_set_pos(clock_alarm_toggle,363-actionWidth/2,312);lv_obj_set_width(clock_alarm_toggle,actionWidth);
+    pixel_button_text(clock_alarm_toggle,timer?(tools.timer()==orbit_time::Timer::Running?"PAU":"STRT"):(c.enabled?"ON":"OFF"));
+    pixel_selected(clock_alarm_toggle,timer?tools.timer()==orbit_time::Timer::Running:c.enabled);
+    for(unsigned i=0;i<8;++i){pixel_selected(clock_slots[i],i==clock_slot);const auto &entry=orbit_time::state(i%4);const bool active=i<4?entry.config().enabled:entry.timer()!=orbit_time::Timer::Idle;lv_obj_set_style_border_width(clock_slots[i],3,0);lv_obj_set_style_border_opa(clock_slots[i],active?LV_OPA_COVER:LV_OPA_TRANSP,0);pixel_center(clock_slots[i]);}
+
 }
 void draw_weather(lv_event_t *event){orbit_weather::draw_icon(event,weather_shape,lv_color_brightness(themed_color(BG))>160,weather_day);}
 void render_weather() {
@@ -1327,11 +1358,12 @@ void tick(lv_timer_t *) {
 #endif
     if(uint32_t(now-clock_poll_at)>=1000){clock_poll_at=now;alarm_wall=orbit_clock::trusted_read();}
     // Recheck only a due candidate; never ring from the1s cached old zone/time.
-    if(orbit_time::state().due(alarm_wall))alarm_wall=orbit_clock::trusted_read();
+    if(orbit_time::due(alarm_wall))alarm_wall=orbit_clock::trusted_read();
     orbit_time::tick(now,alarm_wall);
-    if(orbit_time::state().alerts() && state.view!=CLOCK_ALERT){consume_swipe_contact();show(CLOCK_ALERT);}
+    if(orbit_time::alerts() && state.view!=CLOCK_ALERT){consume_swipe_contact();show(CLOCK_ALERT);}
+    if(screen_awake && !slide_page && state.view==CLOCK_ALERT){const bool dim=(uint32_t(now-clock_alert_since)/600)%2;if(dim!=clock_alert_dim){clock_alert_dim=dim;clock_alert_emphasis(dim);}}
 
-    static unsigned lastTimerSeconds=~0u;const unsigned timerSeconds=orbit_time::state().remaining();
+    static unsigned lastTimerSeconds=~0u;const unsigned timerSeconds=orbit_time::state(clock_slot%4).remaining();
     if(screen_awake && !slide_page && state.view==TIMER_EDIT && timerSeconds!=lastTimerSeconds){lastTimerSeconds=timerSeconds;render_clock();}
     if(screen_awake && state.view==LYRICS)render_lyrics();
     update_iphone_wake(false);
@@ -1534,7 +1566,8 @@ void orbit_ui_touch_sample(int16_t x,int16_t y,bool pressed) {
     dragging=false;
 }
 
-bool orbit_ui_alert_active(){return orbit_time::state().alerts()!=0;}
+bool orbit_ui_alert_active(){return orbit_time::alerts()!=0;}
+bool orbit_ui_dim_when_idle(){return state.view==BLANK_UP && !orbit_ui_alert_active();}
 bool orbit_ui_keep_screen_on(){return orbit_ui_alert_active() || (screen_awake && state.view==LYRICS);}
 
 bool orbit_ui_record_motion_active() {
@@ -1614,6 +1647,7 @@ void orbit_ui_create() {
     lv_obj_set_scroll_dir(intro_viewport,LV_DIR_VER);lv_obj_set_scrollbar_mode(intro_viewport,LV_SCROLLBAR_MODE_ACTIVE);
     lv_obj_set_style_width(intro_viewport,2,LV_PART_SCROLLBAR);lv_obj_set_style_bg_color(intro_viewport,themed_color(MUTED),LV_PART_SCROLLBAR);lv_obj_set_style_bg_opa(intro_viewport,LV_OPA_70,LV_PART_SCROLLBAR);
     intro_body=label(intro_viewport,"",12,0,304,&metadata_title_font,FG);lv_obj_set_style_text_align(intro_body,LV_TEXT_ALIGN_LEFT,0);lv_obj_set_style_text_line_space(intro_body,8,0);lv_label_set_long_mode(intro_body,LV_LABEL_LONG_WRAP);
+    intro_message=label(reader,"",88,250,304,&lv_font_montserrat_18,FG);lv_label_set_long_mode(intro_message,LV_LABEL_LONG_WRAP);
 #if ORBIT_INTRO_ASYNC
     intro_paragraph2=label(intro_viewport,"",12,0,304,&metadata_title_font,FG);lv_obj_set_style_text_align(intro_paragraph2,LV_TEXT_ALIGN_LEFT,0);lv_obj_set_style_text_line_space(intro_paragraph2,8,0);lv_label_set_long_mode(intro_paragraph2,LV_LABEL_LONG_WRAP);
     intro_source_heading=label(intro_viewport,"Source",12,0,304,&lv_font_montserrat_16,MUTED);lv_obj_set_style_text_align(intro_source_heading,LV_TEXT_ALIGN_LEFT,0);hidden(intro_source_heading,true);
@@ -1634,24 +1668,25 @@ void orbit_ui_create() {
     for(unsigned i=0;i<4;++i){char number[8];snprintf(number,sizeof number,"[%u]",i+1);auto *b=button(sources,number,120+60*i,338,60,60,INTRO_SOURCE_BASE+i);intro_source_tabs[i]=b;lv_obj_set_ext_click_area(b,0);lv_obj_set_style_bg_opa(b,LV_OPA_TRANSP,0);lv_obj_set_style_text_font(lv_obj_get_child(b,0),&lv_font_montserrat_16,0);}
     back_button(sources,164,412,52,INTRO_SOURCE_BACK);
     intro_loading=lv_img_create(reader);lv_obj_set_pos(intro_loading,228,207);lv_obj_set_style_img_recolor_opa(intro_loading,LV_OPA_COVER,0);hidden(intro_loading,true);
-    intro_message=label(reader,"",88,250,304,&lv_font_montserrat_18,FG);lv_label_set_long_mode(intro_message,LV_LABEL_LONG_WRAP);
     intro_retry=button(reader,"Retry",168,318,144,52,INTRO_RETRY);lv_obj_set_style_radius(intro_retry,26,0);lv_obj_set_style_bg_opa(intro_retry,LV_OPA_TRANSP,0);lv_obj_set_style_border_width(intro_retry,1,0);lv_obj_set_style_border_color(intro_retry,themed_color(TRACK),0);lv_obj_set_style_text_font(lv_obj_get_child(intro_retry,0),&lv_font_montserrat_18,0);hidden(intro_retry,true);
     intro_feedback=label(reader,"Local sample",90,391,300,&lv_font_montserrat_12,MUTED);
 #endif
     back_button(reader,164,412,52,INTRO_BACK);
     // Dedicated monochrome pixel clock. Only meaningful, tappable information.
-    for(auto v:{BLANK_UP,ALARM_EDIT,TIMER_EDIT,CLOCK_ALERT}){lv_obj_set_style_bg_color(pages[v],lv_color_hex(0),0);lv_obj_set_style_bg_opa(pages[v],LV_OPA_COVER,0);}
+    for(auto v:{BLANK_UP,ALARM_EDIT,TIMER_EDIT,CLOCK_ALERT}){lv_obj_set_style_bg_color(pages[v],lv_color_hex(0),0);lv_obj_set_style_bg_opa(pages[v],LV_OPA_COVER,0);lv_obj_add_event_cb(pages[v],pixel_grid_draw,LV_EVENT_DRAW_POST,nullptr);}
     auto *clock=pages[BLANK_UP];
     clock_date=pixel_label(clock,"",80,68,320);
     clock_time=pixel_label(clock,"--:--",55,125,370,&orbit_pixel_100);
     clock_seconds=pixel_label(clock,"--",286,237,64,&orbit_pixel_40);pixel_label(clock,"SEC",354,255,56);
     clock_zone=pixel_label(clock,"",76,251,100);clock_status=pixel_label(clock,"CONNECT TO WI-FI",60,95,360);
-    box(clock,72,293,336,3,PIXEL_YELLOW);
-    clock_alarm_caption=pixel_label(clock,"ALARM OFF",84,304,240);lv_obj_set_style_text_align(clock_alarm_caption,LV_TEXT_ALIGN_LEFT,0);
-    clock_alarm_value=pixel_button(clock,"SET ALARM",80,333,232,50,CLOCK_ALARM);lv_obj_set_style_text_align(lv_obj_get_child(clock_alarm_value,0),LV_TEXT_ALIGN_LEFT,0);
-    clock_alarm_toggle=pixel_button(clock,"OFF",328,337,72,42,ALARM_TOGGLE);clock_tabs(clock,0);
+    box(clock,72,294,336,3,PIXEL_YELLOW);
+    clock_alarm_value=pixel_button(clock,"07:30",78,312,144,42,CLOCK_ALARM,&orbit_pixel_40);
+    clock_alarm_toggle=pixel_button(clock,"OFF",327,312,72,42,ALARM_TOGGLE);
+    lv_obj_set_style_border_width(clock_alarm_toggle,3,0);lv_obj_set_style_border_color(clock_alarm_toggle,lv_color_hex(PIXEL_YELLOW),0);pixel_center(clock_alarm_toggle);
+    clock_timer_reset=pixel_button(clock,"RST",234,312,72,42,CLOCK_RESET);lv_obj_set_style_border_width(clock_timer_reset,3,0);lv_obj_set_style_border_color(clock_timer_reset,lv_color_hex(PIXEL_YELLOW),0);pixel_center(clock_timer_reset);hidden(clock_timer_reset,true);
+    for(unsigned i=0;i<8;++i){char name[4];clock_slot_label(name,i);clock_slots[i]=pixel_button(clock,name,126+60*(i%4),363+36*(i/4),48,30,CLOCK_SLOT_BASE+i,&orbit_pixel_18);lv_obj_set_style_border_color(clock_slots[i],lv_color_hex(PIXEL_YELLOW),0);lv_obj_set_style_border_side(clock_slots[i],LV_BORDER_SIDE_BOTTOM,0);}
     for(unsigned index=0;index<2;++index){
-        auto *page=pages[index?TIMER_EDIT:ALARM_EDIT];pixel_label(page,index?"TIMER":"ALARM",80,66,320,&orbit_pixel_28);
+        auto *page=pages[index?TIMER_EDIT:ALARM_EDIT];clock_edit_titles[index]=pixel_label(page,index?"T1 TIMER":"A1 ALARM",80,66,320,&orbit_pixel_28);
         pixel_label(page,index?"MINUTE":"HOUR",94,126,128);pixel_label(page,index?"SECOND":"MINUTE",258,126,128);
         auto **fields=index?timer_fields:alarm_fields;
         fields[0]=pixel_button(page,"00",94,163,128,74,EDIT_HOUR,&orbit_pixel_50);fields[1]=pixel_button(page,"00",258,163,128,74,EDIT_MINUTE,&orbit_pixel_50);
@@ -1660,12 +1695,11 @@ void orbit_ui_create() {
         edit_minus[index]=pixel_button(page,"-",98,261,64,54,EDIT_MINUS,&orbit_pixel_28);edit_plus[index]=pixel_button(page,"+",318,261,64,54,EDIT_PLUS,&orbit_pixel_28);
         edit_selection[index]=pixel_label(page,index?"MINUTE":"HOUR",164,277,152);
         clock_save_hint[index]=pixel_label(page,"",90,103,300);
-        clock_tabs(page,index?2:1);
-        if(index){timer_run=pixel_button(page,"START",80,333,152,48,TIMER_RUN);auto *reset=pixel_button(page,"RESET",248,333,152,48,TIMER_RESET);lv_obj_set_style_border_width(reset,2,0);lv_obj_set_style_border_color(reset,lv_color_hex(PIXEL_YELLOW),0);pixel_selected(timer_run,true);}
-        else {auto *save=pixel_button(page,"SAVE",80,333,152,48,ALARM_SAVE);pixel_selected(save,true);alarm_draft_toggle=pixel_button(page,"OFF",272,333,128,48,ALARM_DRAFT_TOGGLE);}
+        clock_back(page);
+        clock_save_buttons[index]=pixel_button(page,"SAVE",150,333,180,48,ALARM_SAVE);pixel_selected(clock_save_buttons[index],true);
     }
     clock_alert_title=pixel_label(pages[CLOCK_ALERT],"ALARM",60,158,360,&orbit_pixel_28);
-    pixel_label(pages[CLOCK_ALERT],"TIME IS UP",80,215,320);
+    clock_alert_rows[0]=pixel_label(pages[CLOCK_ALERT],"",80,204,320);clock_alert_rows[1]=pixel_label(pages[CLOCK_ALERT],"",80,240,320);
     auto *stop=pixel_button(pages[CLOCK_ALERT],"STOP",128,285,224,64,ALERT_STOP,&orbit_pixel_28);pixel_selected(stop,true);
     // Temporary orientation markers show the finger direction that opened each
     // remaining page. Lines/labels are not touch targets or additional buffers.
@@ -1689,7 +1723,7 @@ void orbit_ui_create() {
     weather_city=label(weather,"Weather",65,68,350,&metadata_title_font,FG);lv_label_set_long_mode(weather_city,LV_LABEL_LONG_SCROLL_CIRCULAR);
     weather_icon=box(weather,192,106,96,96,BG);lv_obj_set_style_bg_opa(weather_icon,LV_OPA_TRANSP,0);lv_obj_set_style_text_color(weather_icon,themed_color(GREEN),0);
     lv_obj_add_event_cb(weather_icon,draw_weather,LV_EVENT_DRAW_MAIN,nullptr);hidden(weather_icon,true);
-    weather_temperature=label(weather,"",80,207,320,&lv_font_montserrat_48,FG);
+    weather_temperature=label(weather,"",80,207,320,&orbit_numeric_48,FG);
     weather_condition=label(weather,"Finding your area",50,267,380,&lv_font_montserrat_18,FG);
     weather_range=label(weather,"",80,322,320,&lv_font_montserrat_16,FG);
     weather_details=label(weather,"",55,296,370,&lv_font_montserrat_14,MUTED);
@@ -1778,7 +1812,7 @@ void orbit_ui_create() {
     label(p,"VOLUME",90,110,300,&lv_font_montserrat_14);
     // Direct font drawing needs no transparent transform layer (disabled by
     // the pinned vendor configuration), and no temporary scaling framebuffer.
-    number=label(p,"38",90,184,300,&lv_font_montserrat_48,FG);
+    number=label(p,"38",90,184,300,&orbit_numeric_48,FG);
     volume_unit=label(p,"",80,274,320,&lv_font_montserrat_14);
     volume_buttons[0]=button(p,"-",108,312,72,72,MINUS,0x17221d);
     auto *mute=button(p,"Mute",204,312,72,72,MUTE,0x17221d);

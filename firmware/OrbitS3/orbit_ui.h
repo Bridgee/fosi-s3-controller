@@ -14,6 +14,9 @@ bool orbit_ui_record_motion_active();
 // Local lyrics reading keeps the display lit, including while playback is paused.
 bool orbit_ui_keep_screen_on();
 
+// Clock view remains visible at reduced backlight after touch inactivity.
+bool orbit_ui_dim_when_idle();
+
 // Display-only state: cached snapshots/commands keep running while painting pauses.
 void orbit_ui_set_screen_awake(bool awake);
 

@@ -75,6 +75,22 @@ int main(int argc,char **argv){
     for(int i=0;i<100&&ui->outcome()==Outcome::Pending;++i){testPump();ui->tick(nowMs());tick+=20;}
     assert(channel->deadlineSeen==originalDeadline);
     assert(ui->outcome()==Outcome::Ready&&channel->opens==1);ui->cancel();assert(ui->begin(song,nowMs())==Outcome::Ready&&ui->fromCache()&&channel->opens==1);
+    // Exercise the real session/HTTPS owner, not only MockSession: cancel
+    // another topic in flight and immediately reuse the completed Song cache.
+    for(Topic other:{Topic::Artist,Topic::Release}){
+        tick+=2000;Snapshot pendingTopic=song;pendingTopic.topic=other;
+        channel->stall=true;channel->sent.clear();
+        assert(ui->begin(pendingTopic,nowMs())==Outcome::Pending);
+        for(unsigned n=0;n<24;++n){testPump();ui->tick(nowMs());tick+=20;}
+        assert(ui->outcome()==Outcome::Pending&&channel->live);
+        const auto opened=channel->opens;
+        ui->cancel();assert(ui->begin(song,nowMs())==Outcome::Ready&&ui->fromCache());
+        assert(channel->opens==opened);
+        for(unsigned n=0;n<24;++n){testPump();ui->tick(nowMs());tick+=20;}
+        assert(ui->outcome()==Outcome::Ready&&ui->fromCache()&&channel->opens==opened);
+        assert(!channel->live&&!networkGate().aiActive());channel->stall=false;ui->cancel();
+    }
+    puts("PASS: real HTTPS session pending Artist/Release cancellation preserves immediate cached Song without reopening TLS");
     ui->trackChanged();tick+=2000;channel->sent.clear();channel->opening=[&]{ui->cancel();};ui->begin(song,nowMs());
     for(int i=0;i<4;++i){testPump();ui->tick(nowMs());tick+=20;}assert(ui->outcome()==Outcome::Canceled&&channel->sent.empty());
     // Repeated in-flight cancellation/timeout releases the socket and shared TLS lease,

@@ -7,10 +7,11 @@ function createIntroMock(clock=()=>performance.now()){
  m.remaining=()=>Math.max(0,m.blocked-clock());
  m.cancel=()=>{m.generation++;m.state='canceled';m.job=null;m.value=null;m.fromCache=false};
  m.trackChanged=()=>{if(m.state==='pending')m.cancel();m.cache=[];m.context='';m.failedTopics=0;m.fromCache=false};
- m.reset=scenario=>{m.cancel();m.scenario=['success','retry','rate-limit','timeout','unavailable'].includes(scenario)?scenario:'success';m.state='idle';m.cache=[];m.blocked=0;m.loads=m.hits=m.failedTopics=0;m.context=''};
+ m.reset=scenario=>{m.cancel();m.scenario=['success','retry','rate-limit','timeout','unavailable','disabled'].includes(scenario)?scenario:'success';m.state='idle';m.cache=[];m.blocked=0;m.loads=m.hits=m.failedTopics=0;m.context=''};
  m.begin=(data,topic)=>{
   if(m.state==='pending')return 'busy';
   m.generation++;m.value=null;m.fromCache=false;
+  if(m.scenario==='disabled'){m.job=null;return m.state='disabled'}
   const s={title:data.title||'',artist:data.artist||'',album:data.album||'',duration:Number.isInteger(data.duration)?data.duration:0};
   if(!Number.isInteger(topic)||topic<0||topic>2||![s.title,s.artist,s.album].every(valid)||utf8Bytes(s.title)>=256||utf8Bytes(s.artist)>=192||utf8Bytes(s.album)>=256||s.duration<0||s.duration>86400||!s.artist.trim()||(topic===2&&!s.title.trim())||(topic===1&&!s.title.trim()&&!s.album.trim()))return m.state='invalid_metadata';
   const now=clock(),key=JSON.stringify([introMockPolicy.model,introMockPolicy.version,'en',topic,s]);

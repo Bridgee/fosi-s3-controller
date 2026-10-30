@@ -96,14 +96,17 @@ bool buildRequest(const Snapshot &s,Workspace &w){
 bool validReleaseType(JsonVariantConst v){for(const char *s:{"album","ep","single","compilation","other","unknown"})if(eq(v,s))return true;return false;}
 // Only accept URLs actually supplied by a completed search or URL annotation.
 // Membership is provenance, not proof that every generated claim is entailed.
+// A low-context search can return more than32 URLs. Scan the complete parsed
+// arrays: response bytes and the fixed JSON arena already bound work/memory.
+// Never truncate the list, which could discard a cited URL near its end.
 bool sourceTitle(JsonArrayConst output,const char *url,char *title,size_t cap){
     JsonVariantConst found;bool match=false;
     for(auto item:output){
         if(eq(item["type"],"web_search_call")){
-            auto a=item["action"]["sources"].as<JsonArrayConst>();if(a.size()>32)return false;
+            auto a=item["action"]["sources"].as<JsonArrayConst>();
             for(auto s:a)if(eq(s["type"],"url")&&eq(s["url"],url)){match=true;if(s["title"].is<const char*>())found=s["title"];}
         }else if(eq(item["type"],"message"))for(auto c:item["content"].as<JsonArrayConst>()){
-            auto a=c["annotations"].as<JsonArrayConst>();if(a.size()>16)return false;
+            auto a=c["annotations"].as<JsonArrayConst>();
             for(auto s:a)if(eq(s["type"],"url_citation")&&eq(s["url"],url)){match=true;if(s["title"].is<const char*>())found=s["title"];}
         }
     }
@@ -260,7 +263,7 @@ const char *Engine::message(Outcome o){
     switch(o){case Outcome::Ready:return "";case Outcome::Pending:return "Loading";case Outcome::Busy:return "Please wait";
     case Outcome::Ambiguous:return "Identity unclear";case Outcome::NotFound:return "No introduction found";
     case Outcome::InsufficientEvidence:return "Not enough information";case Outcome::InvalidMetadata:case Outcome::Unavailable:return "Track information unavailable";
-    case Outcome::Disabled:return "Introduction unavailable";case Outcome::ClockUntrusted:return "Waiting for time sync";case Outcome::ResourceLimited:return "Try again later";case Outcome::TlsError:return "Secure connection failed";case Outcome::ProtocolError:return "Could not load introduction";
+    case Outcome::Disabled:return "Introductions are off";case Outcome::ClockUntrusted:return "Waiting for time sync";case Outcome::ResourceLimited:return "Try again later";case Outcome::TlsError:return "Secure connection failed";case Outcome::ProtocolError:return "Could not load introduction";
     case Outcome::Offline:return "Connect to Wi-Fi";case Outcome::ConfigError:return "Check AI settings";case Outcome::RateLimited:return "Try again later";
     case Outcome::Timeout:return "Request timed out";case Outcome::Refused:return "Introduction unavailable";case Outcome::Canceled:case Outcome::Idle:return "";
     default:return "Could not load introduction";}

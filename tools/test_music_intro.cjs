@@ -24,6 +24,7 @@ for(const file of ['index.html','orbit-s3-preview.html']){
  ctx={$,state,tracks,URL,TextEncoder,performance:{now:()=>now},requestAnimationFrame:f=>{const id=nextFrame++;frames.set(id,f);return id},cancelAnimationFrame:id=>frames.delete(id),setInterval:f=>{let id=nextTimer++;timers.set(id,f);return id},clearInterval:id=>timers.delete(id),document:{documentElement:{classList:{toggle:()=>{}}},querySelectorAll:()=>rows},canPlay:()=>active,show};
  vm.createContext(ctx);vm.runInContext(block,ctx);
  const run=s=>vm.runInContext(s,ctx),advance=ms=>{now+=ms;for(const f of [...timers.values()])f()},reset=scenario=>{ctx.params={get:k=>k==='intro'?scenario:k==='introTools'?'1':null};run('configureIntroMocks(params)')};
+ reset('disabled');$('musicExplore').onclick();for(const row of rows){row.onclick();assert.equal($('introMessage').textContent,'Introductions are off');assert($('introViewport').hidden&&$('introSourceList').hidden&&$('introRetry').hidden);assert.equal(run('introMock.loads'),0);$('introReadBack').onclick()}$('introBack').onclick();
  reset('success');$('musicExplore').onclick();assert.equal(state.view,'intro');assert.equal($('introSubject').textContent,tracks[0].title);assert(rows.every(r=>!r.disabled));
  rows[0].onclick();assert.equal(state.view,'intro-read');assert.equal($('introReadSubject').textContent,tracks[0].artist);assert.equal($('introKind').textContent,'Artist');
  assert.equal($('introMessage').textContent,'Loading');assert($('introViewport').hidden);advance(1499);assert.equal($('introMessage').textContent,'Loading');advance(1);
@@ -38,6 +39,7 @@ for(const file of ['index.html','orbit-s3-preview.html']){
  const tourLoads=run('introMock.loads');assert.equal(tourLoads,3);assert.equal(run('introMock.cache.length'),3);
  for(const topic of [0,1,2]){rows[topic].onclick();assert.equal($('introFeedback').textContent,'Local sample | Saved');assert.equal(timers.size,0);$('introReadBack').onclick()}
  $('introBack').onclick();$('musicExplore').onclick();rows[0].onclick();assert.equal(run('introMock.loads'),tourLoads);assert.equal($('introFeedback').textContent,'Local sample | Saved');
+ const beforeHeader=run('introData.album');run("introTopic=1;introData.album='';introMock.value.subject='Identified EP';renderIntro()");assert.equal($('introReadSubject').textContent,'Identified EP');run('renderIntro()');assert.equal($('introReadSubject').textContent,'Identified EP');ctx.restoreRelease=beforeHeader;run('introData.album=restoreRelease;introTopic=0;renderIntro()');
  // End-of-reading named source list reuses the ready value and scroll position.
  const sourceLoads=run('introMock.loads');$('introViewport').scrollTop=83;
  assert(!$('introSourceList').hidden && !$('introReference0').hidden && $('introReference1').hidden);assert.equal($('introReferenceTitle0').textContent,'Local sample (synthetic)');assert(!source.includes('introSourcesOpen')&&!source.includes('introCitation'));const readMarkup=source.match(/id="introViewport"[\s\S]*?id="introLoading"/)[0];assert(readMarkup.indexOf('introParagraph2')<readMarkup.indexOf('introSourceList'));assert(source.includes('<h3 class="music-source-heading">Source</h3>'));

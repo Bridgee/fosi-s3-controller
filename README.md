@@ -7,6 +7,8 @@ It runs on the display; it does not replace the S3's firmware.
 
 **[Try the online simulator](https://bridgee.github.io/fosi-s3-controller/?device=player)** — pure simulation, no real API calls or hardware access.
 
+**Version 0.1.58** · [Clock & timers](https://bridgee.github.io/fosi-s3-controller/?device=blank-up) · [Music introductions](https://bridgee.github.io/fosi-s3-controller/?device=intro)
+
 ## Five pages, one controller
 
 ![Spatial page map: clock above the player, weather below, AirPlay launch left, reserved page right](docs/images/navigation.png)
@@ -14,6 +16,10 @@ It runs on the display; it does not replace the S3's firmware.
 From the player, use these gestures: **down for Clock, up for
 Weather, right for AirPlay launch, left for the reserved page**. Reverse the
 swipe to return. A drag that starts on the volume arc adjusts volume instead.
+
+The grid-aligned pixel clock has **A1–A4 alarms** and **T1–T4 timers**. Select a slot,
+tap its time to edit, then SAVE. Alarms use ON / OFF; timers use RST and STRT / PAU.
+Alerts light the display and flash until STOP. The idle clock dims and stays visible.
 
 ## Inside the player
 
@@ -38,10 +44,12 @@ returns to [the personal homepage](https://bridgee.github.io/).
 - Local S3 discovery, input/output selection, volume, mute, standby and wake.
 - Album artwork, enlarged artwork view, playback progress and a vinyl fallback.
 - Synchronized lyrics when a sufficiently close timed-lyrics match is available.
-- Clock, visual alarm/countdown alerts, and weather with IP-based location/timezone.
-- Eight themes, saved brightness, and touch-to-wake display idle.
+- Clock, four independent alarms and four countdowns with visual alerts; weather
+  and clock timezone share IP-based location.
+- Eight themes, saved brightness, and touch-to-wake display idle. The clock dims
+  after inactivity and stays visible; other pages turn off.
 - Optional iPhone Shortcut launch and short, source-linked music introductions.
-  Both are disabled by default; AI has only been validated with local simulations.
+  Both are disabled by default; AI needs your own private OpenAI configuration.
 
 Transport controls follow the capabilities reported by the source. Bluetooth
 senders may reject pause/play. HDMI/optical signal lock is not verified by this
@@ -71,6 +79,9 @@ pio run -e orbit-live
 An empty S3 URL enables verified mDNS discovery; a manual URL is a fallback.
 Numeric volume writes are read-only until a local ceiling is configured.
 See [configuration](docs/CONFIGURATION.md) for optional services and limits.
+AI setup uses the empty [`ai_local.example.h`](firmware/OrbitS3/ai_local.example.h)
+template; follow the [private configuration steps](docs/CONFIGURATION.md#optional-music-introductions).
+Never upload private configuration or a credential-bearing firmware binary.
 
 To install on the intended T-RGB display, explicitly select its serial port:
 

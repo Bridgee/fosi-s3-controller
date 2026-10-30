@@ -46,6 +46,10 @@ static std::string modifyIntro(const char *status,const char *releaseType="unkno
 }
 static void failed(const std::string &body,Outcome expected){std::unique_ptr<Rig> r(new Rig);CHECK(r->run(body)==expected);CHECK(!r->engine.result());CHECK(r->transport.starts==1);}
 int main(int argc,char **argv){
+    CHECK(!strcmp(readingSubject(true,"Song fallback","Identified EP"),"Identified EP"));
+    CHECK(!strcmp(readingSubject(true,"Song fallback",nullptr),"Song fallback"));
+    CHECK(!strcmp(readingSubject(true,"Song fallback","  "),"Song fallback"));
+    CHECK(!strcmp(readingSubject(false,"Reported release","Other release"),"Reported release"));
     static_assert(sizeof(Engine)<=17*1024,"Bound cache/engine memory");
     static_assert(sizeof(Workspace)<=41*1024,"Bound scratch memory");
     CHECK(argc==2);std::ifstream file(argv[1]);fixture.assign(std::istreambuf_iterator<char>(file),{});CHECK(!fixture.empty());
@@ -176,6 +180,27 @@ int main(int argc,char **argv){
     reset();text["status"]="ambiguous";failed(inner(),Outcome::Malformed);
     reset();text["paragraphs"][0]["source_urls"].add("https://example.org/music/song");failed(inner(),Outcome::Malformed);
     reset();root["output"][1]["content"][0]["annotations"].to<JsonArray>();root["output"][0]["action"]["sources"].to<JsonArray>();failed(encode(root),Outcome::Malformed);
+    // One low-context search can legitimately return40 URLs. Scan the full
+    // arena-bounded list, including tail citations, with no extra heap/storage.
+    for(unsigned count:{33u,40u,64u}){
+        reset();auto sources=root["output"][0]["action"]["sources"].to<JsonArray>();
+        root["output"][1]["content"][0]["annotations"].to<JsonArray>();
+        for(unsigned i=0;i<count;++i){auto src=sources.createNestedObject();src["type"]="url";
+            src["url"]=i+1==count?std::string("https://example.org/music/song"):std::string("https://example.org/unrelated/")+std::to_string(i);}
+        r.reset(new Rig);CHECK(r->run(encode(root))==Outcome::Ready);
+        CHECK(r->engine.result()->sourceCount==1&&!strcmp(r->engine.result()->sources[0].url,"https://example.org/music/song"));
+        sources.remove(count-1);failed(encode(root),Outcome::Malformed); // no invented URL accepted
+    }
+    // Annotation provenance follows the same rule; unrelated entries do not
+    // hide a valid tail citation, and source membership remains mandatory.
+    reset();root["output"][0]["action"]["sources"].to<JsonArray>();
+    auto annotations=root["output"][1]["content"][0]["annotations"].to<JsonArray>();
+    for(unsigned i=0;i<20;++i){auto ref=annotations.createNestedObject();ref["type"]="url_citation";
+        ref["url"]=i==19?std::string("https://example.org/music/song"):std::string("https://example.org/other/")+std::to_string(i);
+        ref["title"]="Verified source";}
+    r.reset(new Rig);CHECK(r->run(encode(root))==Outcome::Ready);
+    CHECK(!strcmp(r->engine.result()->sources[0].title,"Verified source"));
+    annotations[19]["type"]="unrecognized";failed(encode(root),Outcome::Malformed);
     // Errors never become negative cache entries; an explicit retry can succeed.
     r.reset(new Rig);CHECK(r->run("{")==Outcome::Malformed);r->transport.serve();
     CHECK(r->engine.begin(r->track,r->now+FailureCooldownMs+1,true)==Outcome::Pending&&!r->engine.fromCache());

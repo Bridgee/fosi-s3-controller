@@ -49,6 +49,7 @@ void orbit_test_lv_free(void *);
             "-I"+str(work),"-I"+str(root/"tests/fakes"),"-I"+str(lvgl),"-I"+str(root/"firmware/OrbitS3")]
     sources=sorted(lvgl.glob("src/**/*.c"))
     sources+=sorted(root.glob("firmware/OrbitS3/orbit_metadata_*.c"))
+    sources+=[root/"firmware/OrbitS3/orbit_numeric_48.c"]
     sources+=[root/"firmware/OrbitS3/metadata_font.c",root/"firmware/OrbitS3/metadata_text.cpp",root/"firmware/OrbitS3/orbit_ui.cpp",root/"firmware/OrbitS3/appearance_settings.cpp",
               root/"firmware/OrbitS3/lyrics_parser.cpp",root/"firmware/OrbitS3/weather_labels.cpp",root/"firmware/OrbitS3/weather_icon.cpp",root/"firmware/OrbitS3/weather_assets.cpp",root/"firmware/OrbitS3/time_tools.cpp",root/"firmware/OrbitS3/timezone_data.cpp",root/"firmware/OrbitS3/pixel_clock_font.cpp",root/"firmware/OrbitS3/intro_icons.cpp",root/"firmware/OrbitS3/intro_ai.cpp",root/"firmware/OrbitS3/intro_ai_mock.cpp",root/"firmware/OrbitS3/intro_ai_async.cpp",root/"firmware/OrbitS3/intro_ai_runtime.cpp",root/"tests/fakes/intro_async_ui.cpp",root/"firmware/OrbitS3/source_icons.cpp",root/"firmware/OrbitS3/status_icons.cpp",root/"tests/ui_smoke_test.cpp"]
     def compile_one(item):
@@ -74,6 +75,20 @@ void orbit_test_lv_free(void *);
     power=work/"power";power.mkdir()
     metadata=work/"metadata.ppm"
     subprocess.run([str(binary),str(player),str(theme),str(routing),str(about),str(volume),str(muted),str(volume_muted),str(waiting),str(vinyl_playing),str(vinyl_paused),str(bluetooth_about),str(hdmi_about),str(optical_about),str(themes),str(power),str(metadata)],check=True)
+    # Reuse LVGL/assets, but link a real AI-off UI with no Engine/task/transport objects.
+    disabled_common=[flag for flag in common if flag not in ("-DORBIT_INTRO_MOCK=1","-DORBIT_AI_RUNTIME_HOST_TEST=1")]+["-DORBIT_INTRO_MOCK=0"]
+    disabled_objects=[]
+    for index,path in enumerate(sources):
+        if path.name.startswith('intro_ai') or path.name=='intro_async_ui.cpp':continue
+        if path.name in ('orbit_ui.cpp','ui_smoke_test.cpp'):
+            obj=work/(path.stem+'-disabled.o')
+            subprocess.run(["c++","-std=c++11",*disabled_common,"-c",str(path),"-o",str(obj)],check=True)
+            disabled_objects.append(str(obj))
+        else:disabled_objects.append(objects[index])
+    disabled_binary=work/'ui-disabled';disabled_image=work/'intro-disabled.ppm'
+    subprocess.run(["c++","-fsanitize=address,undefined",*disabled_objects,"-o",str(disabled_binary)],check=True)
+    subprocess.run([str(disabled_binary),str(disabled_image)],check=True)
+    Image.open(disabled_image).save(root/'artifacts/native-intro-disabled.png')
     Image.open(metadata).save(root/"artifacts/native-latin-metadata-preview.png")
     for source,name in [(player,"native-player-preview.png"),(theme,"native-theme-preview.png"),(routing,"native-routing-preview.png"),(about,"native-about-preview.png"),(volume,"native-volume-readonly-preview.png"),(muted,"native-muted-preview.png"),(volume_muted,"native-volume-muted-preview.png"),(waiting,"native-footer-waiting-preview.png"),(vinyl_playing,"native-vinyl-playing-preview.png"),(vinyl_paused,"native-vinyl-paused-preview.png"),(bluetooth_about,"native-bluetooth-about-preview.png"),(hdmi_about,"native-hdmi-about-preview.png"),(optical_about,"native-optical-about-preview.png")]:
         Image.open(source).save(root/"artifacts"/name)
@@ -96,3 +111,8 @@ void orbit_test_lv_free(void *);
     motion=[Image.open(p).copy() for p in sorted(power.glob("clock-motion-*.ppm"))]
     if motion:
         motion[0].save(root/"artifacts/native-clock-slide.gif",save_all=True,append_images=motion[1:],duration=[20]*(len(motion)-1)+[1200],loop=0)
+
+    # Fixed matrix checks also inspect the actual LVGL output, not a browser imitation.
+    from test_pixel_clock import check_fonts,check_render
+    check_fonts(root)
+    check_render(root/"artifacts/native-power-clock-ready.png")

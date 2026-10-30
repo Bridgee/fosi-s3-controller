@@ -25,7 +25,7 @@ for(const page of ['index.html','orbit-s3-preview.html']){
  assert(!/fetch\(|XMLHttpRequest|api\.openai|api\.day\.app|\.serial|requestDevice/.test(block));count++;
  const ids=new Set([...text.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));for(const m of text.matchAll(/\$\('([^']+)'\)/g))assert(ids.has(m[1]),page+' missing '+m[1]);count++;
  assert(text.indexOf('const introMock=createIntroMock()')<text.indexOf('configureIntroMocks(previewParams)'));count++;
- assert(text.includes("!['offline','locating','syncing'].includes(previewParams.get('clock'))&&clockData.enabled"));count++;
+ assert(text.includes("!['offline','locating','syncing'].includes(previewParams.get('clock'))&&slot.enabled"));count++;
  assert(!/0\.1\.18|Sample weather|Reserved. Not active on device./.test(text));count++;
 }
 const e=environment();eq(e.$('screen').dataset.firmware,manifest.firmwareVersion);eq(e.about[2].textContent,'Connected');eq(e.about[7].textContent,manifest.firmwareVersion);

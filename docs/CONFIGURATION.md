@@ -25,7 +25,8 @@ Clock timezone and weather location share approximate public-IP geolocation.
 SNTP supplies UTC; bundled IANA rules apply local daylight saving time. An
 unresolved location is not replaced with a guessed timezone. VPN/ISP routing can
 place the display in another city. Alarm and timer reminders are visual only;
-a running timer does not survive power loss.
+alarm times, enable states and timer presets are saved; running countdowns restart
+as idle after power loss.
 
 ## Optional iPhone launch
 
@@ -45,19 +46,58 @@ not retry an uncertain delivery. It wakes a sleeping S3 before sending the push.
 
 ## Optional music introductions
 
-AI is **off by default**. `ai_local.h` alone does not enable it. Copy
-`ai_local.example.h` to `ai_local.h`, supply your API key and a trusted PEM CA for
-`api.openai.com`, then explicitly set `ORBIT_AI_ENABLED 1` in `config_local.h`.
-No insecure TLS fallback is available.
+AI is **off by default**. The online and local browser simulators always use
+synthetic responses and never need a key. The firmware uses OpenAI Responses API,
+`gpt-6.1-terra`, English output, no additional reasoning, one web search at most,
+and short structured text. Check model access and available API credits for your
+key's project before enabling it.
 
-The current adapter uses Responses API, model `gpt-6.1-terra`, English output,
-no additional reasoning, at most one web-search call, and short structured text.
-This provider/model combination has **not been validated with a real request**.
-Check account access, current API compatibility and billing before enabling it.
-Selecting Artist, Release or Song sends track metadata to the provider. Up to
-three completed introductions and their sources are cached in RAM for the
-current track; Back reuses them, and a confirmed track change clears the cache.
-Canceling the local view cannot guarantee that remote processing/billing stops.
+1. Create the ignored private configuration beside the example:
+
+   ```sh
+   cp firmware/OrbitS3/ai_local.example.h firmware/OrbitS3/ai_local.h
+   ```
+
+2. Edit `ai_local.h` locally. Put your project-scoped key inside the quotes of
+   `ORBIT_AI_API_KEY`. Set `ORBIT_AI_CA_CERT` to verified PEM root CA certificates
+   trusted for `api.openai.com`. The template shows portable adjacent C strings
+   with explicit `\n` escapes and continued macro lines. Keep TLS hostname and
+   certificate verification enabled; there is no insecure fallback.
+
+3. In your ignored `config_local.h`, explicitly enable AI, then build:
+
+   ```c
+   #define ORBIT_AI_ENABLED 1
+   ```
+
+   ```sh
+   pio run -e orbit-live
+   ```
+
+Supplying `ai_local.h` alone does not enable AI. The normal disabled firmware
+shows "Introductions are off". Each deliberate Artist, Release or Song selection
+can send the captured track metadata to OpenAI; there is no automatic boot or
+reconnect request. Three completed topic results and their references are cached
+in RAM for the current track. Back reuses them; a confirmed track change clears
+them. Canceling locally cannot guarantee that remote work or billing stops.
+
+Version 0.1.58 has been exercised on the target display with real Artist, Release
+and Song responses, source references, cancellation, track changes and cache reuse.
+Content accuracy, coverage and response time still depend on the provider and music metadata.
+
+### Keep credentials private
+
+Commit only the empty `*.example.h` templates. Git ignores private `*_local.h`
+files, environment files, build directories, binaries and local logs. Run
+`python tools/check_repository.py` in the public checkout before publishing.
+Ignoring a file does not remove an already-tracked file or its Git history.
+
+A configured firmware binary or ELF contains your key: keep it, flash backups,
+build logs and diagnostic responses local. Do not attach them to GitHub releases,
+issues or screenshots. Public CI uses only credential-free verification targets;
+GitHub Pages publishes a separate static simulator inventory. Neither needs an
+API key in repository files, Actions secrets or browser code. If a key is ever
+published, revoke it and create a replacement; deleting a file is insufficient.
 
 Weather/location contact ipwho.is and Open-Meteo. Lyrics send track metadata to
 LRCLIB and, when needed, LrcAPI. Phone launch sends a token-bearing request to

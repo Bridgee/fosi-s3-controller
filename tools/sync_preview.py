@@ -6,7 +6,17 @@ from pathlib import Path
 import argparse,hashlib,json,re,subprocess,tempfile,shutil
 ROOT=Path(__file__).resolve().parents[1]
 PAGES=('index.html','orbit-s3-preview.html')
-INPUTS=('firmware/OrbitS3/firmware_version.h','firmware/OrbitS3/orbit_ui.cpp','firmware/OrbitS3/button_layout.h','firmware/OrbitS3/ui_themes.h','firmware/OrbitS3/status_icons.cpp','firmware/OrbitS3/source_icons.cpp','firmware/OrbitS3/status_feedback.h','firmware/OrbitS3/metadata_font.c','firmware/OrbitS3/metadata_latin_metrics.h','firmware/OrbitS3/weather_labels.cpp','firmware/OrbitS3/weather_assets.cpp','firmware/OrbitS3/lyrics_icon.h','firmware/OrbitS3/swipe_gesture.h','firmware/OrbitS3/touch_regions.h','assets/themes.json','assets/lyrics/preview-data.json','assets/lyrics/preview-model.js','assets/lyrics/preview-ui.js','assets/screen-idle/preview.js','firmware/OrbitS3/lyrics.h','firmware/OrbitS3/lyrics_parser.cpp','firmware/OrbitS3/lyrics_protocol.h','firmware/OrbitS3/lyrics.cpp','assets/preview/guide.js','assets/preview/guide.css','assets/preview/layout.css','assets/preview/runtime.js','assets/preview/embed-frame.css','assets/clock/pixel-glyphs.js','assets/timezones/rules.js','assets/weather/catalog.js','assets/source-icons/protocols.json','assets/source-icons/symbols.html','assets/fonts/montserrat-source.json','ai/mock/preview.js','tools/sync_preview.py','tools/sync_source_icons.py','firmware/OrbitS3/source_status.h','firmware/OrbitS3/status_identity.h')
+INPUTS=('firmware/OrbitS3/firmware_version.h','firmware/OrbitS3/time_tools.h','firmware/OrbitS3/time_tools.cpp','firmware/OrbitS3/orbit_display.cpp','firmware/OrbitS3/orbit_display.h','firmware/OrbitS3/screen_idle.h','firmware/OrbitS3/pixel_clock_font.cpp','firmware/OrbitS3/pixel_clock_font.h','tools/generate_pixel_clock.py','firmware/OrbitS3/orbit_ui.cpp','firmware/OrbitS3/button_layout.h','firmware/OrbitS3/ui_themes.h','firmware/OrbitS3/status_icons.cpp','firmware/OrbitS3/source_icons.cpp','firmware/OrbitS3/status_feedback.h','firmware/OrbitS3/metadata_font.c','firmware/OrbitS3/metadata_latin_metrics.h','firmware/OrbitS3/weather_labels.cpp','firmware/OrbitS3/weather_assets.cpp','firmware/OrbitS3/lyrics_icon.h','firmware/OrbitS3/swipe_gesture.h','firmware/OrbitS3/touch_regions.h','assets/themes.json','assets/lyrics/preview-data.json','assets/lyrics/preview-model.js','assets/lyrics/preview-ui.js','assets/screen-idle/preview.js','firmware/OrbitS3/lyrics.h','firmware/OrbitS3/lyrics_parser.cpp','firmware/OrbitS3/lyrics_protocol.h','firmware/OrbitS3/lyrics.cpp','assets/preview/guide.js','assets/preview/guide.css','assets/preview/layout.css','assets/preview/runtime.js','assets/preview/embed-frame.css','assets/clock/pixel-glyphs.js','assets/timezones/rules.js','assets/weather/catalog.js','assets/source-icons/protocols.json','assets/source-icons/symbols.html','assets/fonts/montserrat-source.json','ai/mock/preview.js','tools/sync_preview.py','tools/sync_source_icons.py','firmware/OrbitS3/source_status.h','firmware/OrbitS3/status_identity.h')
+
+INPUTS += ('firmware/OrbitS3/intro_ai.h', 'firmware/OrbitS3/intro_ai.cpp', 'firmware/OrbitS3/intro_ai_policy.h', 'firmware/OrbitS3/intro_ai_async.h', 'firmware/OrbitS3/intro_ai_async.cpp', 'firmware/OrbitS3/intro_ai_runtime.h', 'firmware/OrbitS3/intro_ai_runtime.cpp', 'firmware/OrbitS3/intro_ai_settings.h', 'firmware/OrbitS3/intro_ai_settings.cpp', 'firmware/OrbitS3/intro_ai_http.h', 'firmware/OrbitS3/intro_ai_http.cpp', 'firmware/OrbitS3/intro_ai_https.h', 'firmware/OrbitS3/intro_ai_https.cpp', 'firmware/OrbitS3/intro_ai_esp32.cpp', 'firmware/OrbitS3/intro_ai_gate.cpp', 'firmware/OrbitS3/intro_ai_worker.h', 'firmware/OrbitS3/intro_ai_mock.cpp', 'firmware/OrbitS3/intro_ai_mock_data.h', 'firmware/OrbitS3/intro_ai_contract.h', 'ai/prompts/openai_intro.txt', 'ai/schemas/openai_intro.json')
+
+INPUTS += ('firmware/OrbitS3/config.h','firmware/OrbitS3/intro_icons.cpp','firmware/OrbitS3/intro_icons.h','assets/music-icons/manifest.json','assets/music-icons/artist.svg','assets/music-icons/album.svg','assets/music-icons/song.svg')
+
+INPUTS += ('firmware/OrbitS3/metadata_font.h','firmware/OrbitS3/orbit_metadata_12.c','firmware/OrbitS3/orbit_metadata_24.c','firmware/OrbitS3/orbit_metadata_latin_14.c','firmware/OrbitS3/orbit_metadata_latin_24.c')
+
+INPUTS += ('firmware/OrbitS3/orbit_numeric_48.c','include/lv_conf.h')
+
+INPUTS += ('tools/font_generation.py','tools/pack_metadata_fonts.py','tools/generate_metadata_fonts.py','tools/generate_latin_fonts.py','tools/generate_numeric_font.py','assets/fonts/metadata-fingerprints.json')
 
 def script_json(value):
  return json.dumps(value,ensure_ascii=False,separators=(',',':')).replace('&','\\u0026').replace('<','\\u003c').replace('>','\\u003e').replace('\u2028','\\u2028').replace('\u2029','\\u2029')
@@ -103,6 +113,7 @@ def check():
   assert block and f'"firmwareVersion":"{version()}"' in block[1],name+' missing current contract'
   assert text.count('src="assets/preview/guide.js"')==1,name+' missing shared simulator guide'
   assert text.count('href="assets/preview/guide.css"')==1,name+' missing simulator guide styles'
+  assert (ROOT/'assets/screen-idle/preview.js').read_text() in text,name+' stale idle policy'
   assert 'id="aboutFirmware"' in text
   for asset in ('assets/lyrics/preview-model.js','assets/lyrics/preview-ui.js'):assert (ROOT/asset).read_text() in text,name+' stale lyric model/UI'
   lyric_data=json.loads((ROOT/'assets/lyrics/preview-data.json').read_text())
@@ -184,7 +195,7 @@ def generate():
  frame_ms=int(re.search(r'now-frame_at\)>=(\d+)',ui)[1]);frame_count=int(re.search(r'FrameCount=(\d+)',(ROOT/'firmware/OrbitS3/status_identity.h').read_text())[1])
  contract={'firmwareVersion':version(),'mode':'offline_simulation','rects':rects,'statusFrameMs':frame_ms,'statusFrames':frame_count,'glyphs':glyphs,'sourceQr':qr_sources,
   'inputs':{name:digest(ROOT/name) for name in INPUTS},'assets':{str(path.relative_to(ROOT)):digest(path) for path in generated},
-  'intentionalDifferences':['Synthetic local data; no API/device or geolocation requests','Browser brightness approximates hardware backlight','Sources use native-encoded fixture QR codes; other synthetic URLs use a clickable URL fallback','Browser text anti-aliasing/physical color differs; pinned Montserrat and native icon masks are shared']}
+  'intentionalDifferences':['Synthetic local data; no API/device or geolocation requests','Browser introductions use offline samples; ordinary firmware keeps AI off until explicitly configured','Browser-only guides and scenario panels are simulator controls, not missing firmware screens','Browser brightness approximates hardware backlight','Sources use native-encoded fixture QR codes; other synthetic URLs use a clickable URL fallback','Browser text anti-aliasing/physical color differs; pinned Montserrat and native icon masks are shared']}
  css=(out/'layout.css').read_text();runtime=(out/'runtime.js').read_text()
  for name in PAGES:
   path=ROOT/name;text=path.read_text()
@@ -192,6 +203,8 @@ def generate():
    text=text.replace('</style>','</style>\n<link rel="stylesheet" href="assets/preview/guide.css">',1)
   if 'src="assets/preview/guide.js"' not in text:
    text=re.sub(r'(<script>[\s\S]*?</script>)',lambda match:match[0]+'\n<script src="assets/preview/guide.js" defer></script>',text,count=1)
+  idle_block='// orbit-screen-idle:start\n'+(ROOT/'assets/screen-idle/preview.js').read_text()+"\ninstallScreenIdle($('screen'),30000,document);\n// orbit-screen-idle:end"
+  text=re.sub(r'// orbit-screen-idle:start[\s\S]*?// orbit-screen-idle:end',lambda _:idle_block,text,count=1)
   lyric_data=json.loads((ROOT/'assets/lyrics/preview-data.json').read_text())
   lyric_block='// orbit-lyrics-preview:start\nconst lyricsPreviewCatalog='+script_json(lyric_data)+';\n'+(ROOT/'assets/lyrics/preview-model.js').read_text()+'\n'+(ROOT/'assets/lyrics/preview-ui.js').read_text()+'\n// orbit-lyrics-preview:end'
   text=re.sub(r'// orbit-lyrics-preview:start[\s\S]*?// orbit-lyrics-preview:end',lambda _:lyric_block,text,count=1)

@@ -10,9 +10,10 @@ std::vector<int> calls;
 lv_disp_drv_t *registeredDriver=nullptr;lv_indev_drv_t *registeredTouch=nullptr;
 lv_disp_t fakeDisplay;lv_timer_t fakeRefresh;int fakeRoot=0;void *heapBuffer=nullptr;
 void orbit_ui_set_screen_awake(bool awake){calls.push_back(awake?10:11);}
-bool keepScreenOn=false,alertActive=false;
+bool keepScreenOn=false,alertActive=false,clockPage=false;
 bool orbit_ui_alert_active(){return alertActive;}
 bool orbit_ui_keep_screen_on(){return keepScreenOn;}
+bool orbit_ui_dim_when_idle(){return clockPage&&!alertActive;}
 bool filteredPress=false;
 void orbit_ui_touch_sample(int16_t,int16_t,bool pressed){filteredPress=pressed;}
 static bool read(uint32_t now,bool pressed,int16_t x=240,int16_t y=240) {
@@ -51,6 +52,23 @@ int main() {
     calls.clear();alertActive=true;poll(307100);assert(orbit_display_awake()&&panel.getBrightness()==16&&!fakeRefresh.paused);
     for(unsigned now=308000;now<430000;now+=1000)poll(now);
     assert(orbit_display_awake());alertActive=false;poll(458999);assert(orbit_display_awake());poll(459000);assert(!orbit_display_awake());
+    // Clock idle keeps actual LVGL refresh running; only the backlight changes.
+    clockPage=true;calls.clear();poll(459100);
+    assert(orbit_display_awake()&&orbit_display_dimmed()&&!fakeRefresh.paused);
+    assert(panel.getBrightness()==2&&orbit_display_brightness()==16);
+    calls.clear();poll(460000);poll(490000);assert(calls.empty());
+    // One entire wake contact is swallowed, including hold/drag, then controls work.
+    assert(!read(490100,true));poll(490100);
+    assert(!orbit_display_dimmed()&&panel.getBrightness()==16&&calls==std::vector<int>{116});
+    assert(!read(490200,true,328,337));assert(!read(490300,false));
+    assert(read(490400,true));assert(!read(490500,false));
+    calls.clear();poll(520500);assert(orbit_display_dimmed()&&panel.getBrightness()==2);
+    orbit_display_set_brightness(4);assert(panel.getBrightness()==1&&orbit_display_brightness()==4);
+    // A due alert restores the selected level, then the clock can dim again.
+    alertActive=true;poll(520600);assert(!orbit_display_dimmed()&&panel.getBrightness()==4);
+    alertActive=false;poll(550600);assert(orbit_display_dimmed()&&panel.getBrightness()==1);
+    clockPage=false;poll(550700);assert(!orbit_display_awake()&&panel.getBrightness()==0&&fakeRefresh.paused);
+    assert(orbit_display_brightness()==4); // Never persist dim/off as user brightness.
     free(heapBuffer);
     puts("PASS: actual display adapter pauses refresh, preserves touch polling, consumes wake hold/drag, redraws before restoring saved brightness");
 }

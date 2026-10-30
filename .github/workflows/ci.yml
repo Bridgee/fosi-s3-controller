@@ -23,9 +23,13 @@ jobs:
       - run: python tools/test_native.py
       - run: python tools/test_preview_sync.py
       - run: node tools/test_preview_parity.cjs
+      - run: node tools/test_clock_slots.cjs
       - run: node tools/test_preview_transitions.cjs
       - run: node tools/test_music_intro.cjs
       - run: python tools/test_swipes.py
       - run: python tools/test_preview_lyrics.py
       - run: python tools/test_preview_server.py
+      - run: python tools/test_font_generation.py
+      - run: python -O tools/test_font_generation.py
+      - run: python tools/test_metadata_fonts.py
       - run: python tools/test_ui.py

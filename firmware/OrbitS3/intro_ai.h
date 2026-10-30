@@ -32,7 +32,7 @@ struct Introduction {
 };
 // Time arguments are 64-bit monotonic milliseconds (e.g. esp_timer_get_time/1000),
 // never SNTP wall time or unextended millis().
-// Caller allocates lazily in PSRAM in the future. Never put this on a task stack.
+// Background runtime allocates lazily in PSRAM. Never put this on a task stack.
 // Workspace and Transport must both outlive Engine. Allocate the whole feature
 // lazily; this reference-based core does not free/rebind its workspace per call.
 struct Workspace {

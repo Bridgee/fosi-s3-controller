@@ -22,8 +22,10 @@ public:
     Config config()const{return config_;}Timer timer()const{return timer_;}
     unsigned remaining()const{return (remaining_+999)/1000;}uint32_t fired()const{return fired_;}uint32_t firedZone()const{return firedZone_;}uint8_t alerts()const{return alerts_;}
 };
-void begin();const Engine &state();bool saved();
-bool alarm(unsigned hour,unsigned minute,bool enabled);bool preset(unsigned seconds);
-void start(uint32_t now);void pause(uint32_t now);void reset();void dismiss();
+constexpr unsigned Slots=4;
+void begin();const Engine &state(unsigned slot=0);bool saved();
+uint8_t alerts();uint8_t alarm_mask();uint8_t timer_mask();bool due(const orbit_clock::Reading &wall);
+bool alarm(unsigned hour,unsigned minute,bool enabled,unsigned slot=0);bool preset(unsigned seconds,unsigned slot=0);
+void start(uint32_t now,unsigned slot=0);void pause(uint32_t now,unsigned slot=0);void reset(unsigned slot=0);void dismiss();
 void tick(uint32_t now,const orbit_clock::Reading &wall);
 }

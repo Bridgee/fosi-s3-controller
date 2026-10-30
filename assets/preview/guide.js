@@ -29,22 +29,22 @@
       'These values are simulated; no device is connected.'
     ], 'Tap Back to return to the page you came from.'),
     'blank-up': page('Clock', 'Local time, alarm and countdown.', [
-      'Tap ALRM or SET ALARM to edit an alarm.',
-      'Tap the ON / OFF control to enable or disable it.',
-      'Tap TMR for a countdown. The preview uses the browser’s time zone.'
+      'Select A1–A4 or T1–T4, then tap its time to edit.',
+      'Use ON / OFF for an alarm, or RST to reset, STRT to start / resume, and PAU to pause for the selected timer.',
+      'After 30 seconds, the clock dims and keeps time. Tap once to restore brightness.'
     ], 'Swipe up to return to the player.'),
     'clock-alarm': page('Alarm', 'Set a visual alarm.', [
       'Select HOUR or MINUTE, then use − and +.',
-      'Choose ON / OFF, then tap SAVE.',
-      'When due, the display lights up and waits for STOP.'
-    ], 'Tap TIME for the clock, TMR for the timer, or swipe up for the player.'),
-    'clock-timer': page('Timer', 'Start or pause a countdown.', [
+      'Tap SAVE to keep this alarm time. Enable it with ON / OFF on the clock.',
+      'When due, the display lights up; the reminder pulses until STOP.'
+    ], 'Tap BACK for the clock, or swipe up for the player.'),
+    'clock-timer': page('Timer', 'Edit one of four independent countdowns.', [
       'Select MINUTE or SECOND, then use − and +.',
-      'Tap START / PAUSE; RESET restores the set duration.',
-      'At zero, the display lights up with a visual alert.'
-    ], 'Tap TIME for the clock, ALRM for the alarm, or swipe up for the player.'),
+      'Tap SAVE, then use STRT / PAU and RST on the clock.',
+      'Pause a running timer before editing. At zero, it lights the display.'
+    ], 'Tap BACK for the clock, or swipe up for the player.'),
     'clock-alert': page('Time is up', 'An alarm or countdown needs attention.', [
-      'Tap STOP on the display to dismiss the alert.',
+      'The reminder pulses; tap the steady STOP button to dismiss it.',
       'The alert stays visible until you stop it; it makes no sound.'
     ], 'Dismiss the alert before navigating.'),
     'blank-down': page('Weather', 'Sample local conditions.', [
@@ -86,13 +86,15 @@
       'Tap the central power icon to wake the simulated S3.',
       'AirPlay launch wakes the S3 before starting its simulated flow.'
     ], 'Swipe down: Clock · up: Weather · right: AirPlay · left: Reserved. Swiping does not wake the S3.'),
+    dimmed: page('Clock · Dimmed', 'An always-visible clock at reduced brightness.', ['Time keeps updating while the display is dimmed.','Tap once to restore your brightness. This first touch does not change a control.'], 'After waking, swipe up to return to the player.'),
     asleep: page('Display asleep', 'The preview dims after 30 seconds without interaction.', [
       'Tap the round display once to wake it.',
       'That first tap only wakes the display; it does not activate a control.'
     ], 'Once lit, use the normal controls or swipe between pages.')
   };
-  function selectGuide({view, asleep, standby, artwork, vinyl}) {
+  function selectGuide({view, asleep, standby, artwork, vinyl, dimmed}) {
     if (asleep) return {key:'asleep', ...guides.asleep};
+    if (view === 'blank-up' && dimmed) return {key:'dimmed', ...guides.dimmed};
     if (view === 'player' && standby) return {key:'standby', ...guides.standby};
     if (view === 'player' && artwork) return {key:'artwork', ...guides.artwork};
     const key = Object.hasOwn(guides, view) ? view : 'player';
@@ -133,7 +135,7 @@
     const visible = screen.querySelector('.page:not([hidden])');
     const vinyl = document.getElementById('vinyl');
     const guide = selectGuide({view:visible?.id.replace('page-',''),
-      asleep:screen.classList.contains('display-asleep'),standby:screen.classList.contains('standby'),
+      asleep:screen.classList.contains('display-asleep'),dimmed:screen.classList.contains('display-dimmed'),standby:screen.classList.contains('standby'),
       artwork:screen.classList.contains('artwork-open'),vinyl:vinyl && !vinyl.hidden});
     if (guide.key === lastKey) return;
     lastKey = guide.key;aside.dataset.page = guide.key;

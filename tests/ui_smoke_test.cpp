@@ -224,6 +224,8 @@ static void assert_touch_targets() {
         lv_area_t a;lv_obj_get_click_area(b,&a);
         if(lv_obj_get_width(b)==80 && lv_obj_get_height(b)==40)
             assert(lv_area_get_width(&a)>=80 && lv_area_get_height(&a)>=40); // Physical bottom strip.
+        else if(lv_obj_get_child_cnt(b) && lv_obj_get_style_text_font(lv_obj_get_child(b,0),0)==&orbit_pixel_18)
+            assert(lv_area_get_width(&a)>=60 && lv_area_get_height(&a)>=36); // Dense, disjoint clock selector grid.
         else assert(lv_area_get_width(&a)>=60 && lv_area_get_height(&a)>=60);
     }
     // Check actual hit tests, including trimmed side targets, at every overlap pixel.
@@ -237,7 +239,11 @@ static void assert_touch_targets() {
     }
 }
 static void advance(unsigned ticks=100) {
-    for(unsigned i=0;i<ticks/10;i++) {lv_tick_inc(10);orbit_intro_runtime::testPump();lv_timer_handler();}
+    for(unsigned i=0;i<ticks/10;i++) {lv_tick_inc(10);
+#if ORBIT_INTRO_ASYNC
+    orbit_intro_runtime::testPump();
+#endif
+    lv_timer_handler();}
 }
 static lv_point_t pointer_point={0,0};
 static lv_indev_state_t pointer_state=LV_INDEV_STATE_REL;
@@ -256,7 +262,7 @@ static void click(const char *prefix) {
 static void assert_canvas_edge() {
     // Even pixels outside the nominal circular aperture must be dark theme BG,
     // so an aperture/raster mismatch cannot expose a light LVGL screen/fringe.
-    const auto background=(button(lv_scr_act(),"TIME") || button(lv_scr_act(),"STOP"))?lv_color_hex(0).full:lv_obj_get_style_bg_color(lv_scr_act(),0).full;
+    const auto background=(button(lv_scr_act(),"A1") || button(lv_scr_act(),"BACK") || button(lv_scr_act(),"STOP"))?lv_color_hex(0).full:lv_obj_get_style_bg_color(lv_scr_act(),0).full;
     for(int i=0;i<480;++i) {
         assert(frame[i].full==background && frame[479*480+i].full==background);
         assert(frame[i*480].full==background && frame[i*480+479].full==background);
@@ -343,6 +349,13 @@ int main(int argc,char **argv) {
     input.type=LV_INDEV_TYPE_POINTER;input.read_cb=pointer_read;
     assert(lv_indev_drv_register(&input));
     orbit_ui_create();advance();
+#if !ORBIT_INTRO_ASYNC
+    s3::next.connected=true;s3::next.link=s3::LinkState::Ready;s3::next.power=s3::PowerState::Online;s3::next.sourceKnown=s3::next.playerKnown=true;s3::next.input=0;s3::next.playing=true;s3::next.duration=258;
+    strcpy(s3::next.title,"A Place Between");strcpy(s3::next.artist,"Northline");strcpy(s3::next.album,"Still / Moving");s3::pending=true;advance(200);
+    click("Music information");for(const char *topic:{"Artist","Release","Song"}){click(topic);assert(has_label(lv_scr_act(),"Introductions are off")&&!reading_view(lv_scr_act())&&!button(lv_scr_act(),"Retry")&&!button(lv_scr_act(),"[1]"));assert_touch_targets();advance(2000);assert(has_label(lv_scr_act(),"Introductions are off"));if(argc>1 && !strcmp(topic,"Song"))screenshot(argv[1]);click("Back");}
+    click("Back");assert(button(lv_scr_act(),"I/O")&&s3::writes==0&&s3::volume_writes==0);
+    puts("PASS: production default-disabled LVGL UI shows honest off state for all3 topics; no filler/citations/loading/retries or audio writes; AI runtime/provider are not linked");
+#else
     // Unknown is text-only, centered in both locations, without a blank icon slot.
     assert(s3::source_icon_image(s3::SourceIcon::Unknown)==nullptr);
     auto checkSourceCenter=[](const char *text) {
@@ -1003,7 +1016,7 @@ int main(int argc,char **argv) {
     s3::pending=true;advance(300);assert(button(lv_scr_act(),"I/O"));
     const auto navigationWrites=s3::writes,navigationVolumeWrites=s3::volume_writes;
     auto assertBlank=[](){assert(!button(lv_scr_act(),"I/O")&&!button(lv_scr_act(),"Back")&&!footer_visible());
-        assert(button(lv_scr_act(),"TIME") || has_label(lv_scr_act(),"Weather") ||
+        assert(button(lv_scr_act(),"A1") || has_label(lv_scr_act(),"Weather") ||
                has_label(lv_scr_act(),"Swiped left") || has_label(lv_scr_act(),"Apple Music"));
         assert_canvas_edge();};
     auto swipePointer=[](int x,int y,int dx,int dy){pointer(x,y,true,70);pointer(x+dx/2,y+dy/2,true,60);pointer(x+dx,y+dy,true,60);pointer(x+dx,y+dy,false,80);advance(360);};
@@ -1102,18 +1115,25 @@ int main(int argc,char **argv) {
     orbit_clock::fixture.hour=12;orbit_clock::fixture.minute=34;orbit_clock::fixture.second=56;orbit_clock::fixture.day=25;orbit_clock::fixture.month=10;orbit_clock::fixture.year=2026;orbit_clock::fixture.weekday=0;orbit_clock::fixture.dateKey=20261025;orbit_clock::fixture.epoch=1792956896;
     advance(1200);assert(has_label(lv_scr_act(),"SUN 25 OCT")&&has_label(lv_scr_act(),"12:34")&&has_label(lv_scr_act(),"56")&&has_label(lv_scr_act(),"PDT"));
     assert(!image_of_size(lv_scr_act(),480));assert(lv_obj_get_style_text_font(find_named_label(lv_scr_act(),"12:34"),0)==&orbit_pixel_100);
-    assert(has_label(lv_scr_act(),"ALARM OFF")&&button(lv_scr_act(),"SET ALARM"));assert(!button(lv_scr_act(),"Back")&&!footer_visible());
+    assert(button(lv_scr_act(),"A1")&&button(lv_scr_act(),"A4")&&button(lv_scr_act(),"T4")&&button(lv_scr_act(),"07:30"));assert(orbit_ui_dim_when_idle());assert(!button(lv_scr_act(),"Back")&&!footer_visible());
+    lv_area_t fixedTime;lv_obj_get_coords(button(lv_scr_act(),"07:30"),&fixedTime);assert(fixedTime.x1==78&&fixedTime.y1==312&&lv_area_get_width(&fixedTime)==144);
+    lv_area_t upperClock;lv_obj_get_coords(find_named_label(lv_scr_act(),"SEC"),&upperClock);assert(fixedTime.y1-297==294-(upperClock.y2+1));
+    for(const char *slot:{"A1","A2","A3","A4","T1","T2","T3","T4"}){click(slot);lv_area_t currentTime;lv_obj_get_coords(button(lv_scr_act(),slot[0]=='A'?"07:30":"05:00"),&currentTime);assert(currentTime.x1==fixedTime.x1&&currentTime.y1==fixedTime.y1&&currentTime.x2==fixedTime.x2&&currentTime.y2==fixedTime.y2);assert_button_labels_fit(lv_scr_act());assert_touch_targets();}
+    click("A1");assert(lv_obj_get_width(button(lv_scr_act(),"OFF"))==72);
     const auto clockFirstPixels=clock_pixels();if(argc>15){char path[512];snprintf(path,sizeof(path),"%s/clock-ready.ppm",argv[15]);screenshot(path);}
     s3::next.connected=false;s3::pending=true;advance(1200);assert(clock_pixels()==clockFirstPixels);
     orbit_ui_set_screen_awake(false);const auto clockReads=orbit_clock::reads;orbit_clock::fixture.minute=35;orbit_clock::fixture.second=1;advance(2500);assert(orbit_clock::reads==clockReads);orbit_ui_set_screen_awake(true);advance(100);assert(has_label(lv_scr_act(),"12:35"));
     for(unsigned second:{0u,10u,20u,30u,40u,50u}){orbit_clock::fixture.second=second;advance(1200);const auto partial=clock_pixels();lv_obj_invalidate(lv_scr_act());advance(60);assert(clock_pixels()==partial);}
-    const auto clockWrites=s3::writes;click("ALRM");assert(has_label(lv_scr_act(),"ALARM")&&button(lv_scr_act(),"07"));click("-");assert(button(lv_scr_act(),"06"));click("OFF");click("SAVE");assert(orbit_time::state().config().enabled&&orbit_time::state().config().hour==6&&has_label(lv_scr_act(),"NEXT ALARM"));
+    const auto clockWrites=s3::writes;click("07:30");assert(has_label(lv_scr_act(),"A1 ALARM")&&button(lv_scr_act(),"07")&&!button(lv_scr_act(),"OFF"));click("-");assert(button(lv_scr_act(),"06"));click("SAVE");assert(!orbit_time::state().config().enabled&&orbit_time::state().config().hour==6);click("OFF");assert(orbit_time::state().config().enabled&&lv_obj_get_width(button(lv_scr_act(),"ON"))==54);
     if(argc>15){char path[512];snprintf(path,sizeof(path),"%s/clock-alarm-enabled.ppm",argv[15]);screenshot(path);}
-    click("ALRM");if(argc>15){char path[512];snprintf(path,sizeof(path),"%s/clock-alarm-edit.ppm",argv[15]);screenshot(path);}click("TIME");click("ON");assert(!orbit_time::state().config().enabled);
-    click("TMR");click("-");assert(orbit_time::state().config().seconds==240);click("00");click("+");assert(orbit_time::state().config().seconds==241);click("START");advance(1100);assert(orbit_time::state().timer()==orbit_time::Timer::Running);click("PAUSE");const auto pausedSeconds=orbit_time::state().remaining();advance(3000);assert(orbit_time::state().remaining()==pausedSeconds&&button(lv_scr_act(),"RESUME"));
-    if(argc>15){char path[512];snprintf(path,sizeof(path),"%s/clock-timer-paused.ppm",argv[15]);screenshot(path);}click("RESET");assert(orbit_time::state().remaining()==241);orbit_time::preset(1);click("START");
+    click("06:30");if(argc>15){char path[512];snprintf(path,sizeof(path),"%s/clock-alarm-edit.ppm",argv[15]);screenshot(path);}click("BACK");click("ON");assert(!orbit_time::state().config().enabled);
+    // Each slot has an independent draft; backing out cannot change saved data.
+    click("A2");click("07:30");click("+");click("BACK");assert(orbit_time::state(1).config().hour==7);click("07:30");click("+");click("SAVE");click("OFF");assert(orbit_time::state(1).config().hour==8&&orbit_time::state(1).config().enabled&&!orbit_time::state(0).config().enabled);click("ON");
+    click("T1");click("05:00");click("-");assert(orbit_time::state().config().seconds==300);click("00");click("+");click("SAVE");assert(orbit_time::state().config().seconds==241);assert(lv_obj_get_width(button(lv_scr_act(),"STRT"))==90);click("STRT");assert(lv_obj_get_width(button(lv_scr_act(),"PAU"))==72);advance(1100);assert(orbit_time::state().timer()==orbit_time::Timer::Running);click("T2");click("STRT");click("T1");click("PAU");const auto pausedSeconds=orbit_time::state().remaining();advance(3000);assert(orbit_time::state().remaining()==pausedSeconds&&button(lv_scr_act(),"STRT")&&orbit_time::state(1).timer()==orbit_time::Timer::Running);click("T2");click("RST");assert(orbit_time::state(1).timer()==orbit_time::Timer::Idle&&orbit_time::state(1).remaining()==300);click("T1");assert(orbit_time::state().remaining()==pausedSeconds);
+    if(argc>15){char path[512];snprintf(path,sizeof(path),"%s/clock-timer-paused.ppm",argv[15]);screenshot(path);}orbit_time::preset(1);advance(1200);click("STRT");
     swipePointer(240,240,0,-110);assert(button(lv_scr_act(),"I/O"));orbit_ui_set_screen_awake(false);advance(1200);assert(orbit_ui_alert_active()&&orbit_ui_keep_screen_on());orbit_ui_set_screen_awake(true);advance(100);assert(button(lv_scr_act(),"STOP")&&has_label(lv_scr_act(),"TIMER DONE"));
-    if(argc>15){char path[512];snprintf(path,sizeof(path),"%s/clock-timer-alert.ppm",argv[15]);screenshot(path);}swipePointer(240,240,110,0);assert(button(lv_scr_act(),"STOP"));click("STOP");assert(!orbit_ui_alert_active()&&button(lv_scr_act(),"TIME")&&s3::writes==clockWrites);
+    auto *alertCopy=find_named_label(lv_scr_act(),"TIMER DONE"),*stopCopy=lv_obj_get_child(button(lv_scr_act(),"STOP"),0);const auto alertOpa=lv_obj_get_style_text_opa(alertCopy,0),stopOpa=lv_obj_get_style_text_opa(stopCopy,0);advance(600);assert(lv_obj_get_style_text_opa(alertCopy,0)!=alertOpa&&lv_obj_get_style_text_opa(stopCopy,0)==stopOpa);advance(600);assert(lv_obj_get_style_text_opa(alertCopy,0)==alertOpa);
+    if(argc>15){char path[512];snprintf(path,sizeof(path),"%s/clock-timer-alert.ppm",argv[15]);screenshot(path);}swipePointer(240,240,110,0);assert(button(lv_scr_act(),"STOP"));click("STOP");assert(!orbit_ui_alert_active()&&button(lv_scr_act(),"A1")&&s3::writes==clockWrites);
     // An alert interrupting a held old control cannot consume itself or send audio.
     swipePointer(240,240,0,-110);orbit_time::preset(1);orbit_time::start(lv_tick_get());pointer(70,240,true,200);advance(1000);pointer(70,240,false,100);assert(button(lv_scr_act(),"STOP")&&s3::writes==clockWrites);click("STOP");
     // Revalidate a due cached minute before alarming if timezone/time changed.
@@ -1123,8 +1143,9 @@ int main(int argc,char **argv) {
     orbit_time::alarm(orbit_clock::fixture.hour,orbit_clock::fixture.minute,true);advance(200);assert(!orbit_ui_alert_active());orbit_clock::trustedHook=nullptr;orbit_time::alarm(7,30,false);
     // Daily alarm reaches the same persistent, silent visual reminder path.
     orbit_time::alarm(orbit_clock::fixture.hour,orbit_clock::fixture.minute,true);advance(1200);assert(has_label(lv_scr_act(),"ALARM")&&button(lv_scr_act(),"STOP"));
+    auto *alarmCopy=find_named_label(lv_scr_act(),"ALARM");const auto alarmOpa=lv_obj_get_style_text_opa(alarmCopy,0);advance(600);assert(lv_obj_get_style_text_opa(alarmCopy,0)!=alarmOpa);
     if(argc>15){char path[512];snprintf(path,sizeof(path),"%s/clock-alarm-alert.ppm",argv[15]);screenshot(path);}click("STOP");advance(1200);assert(!orbit_ui_alert_active()&&s3::writes==clockWrites);orbit_time::alarm(7,30,false);
-    click("ALRM");click("+");fake_preferences::state().failWrite=true;click("SAVE");assert(button(lv_scr_act(),"SAVE")&&has_label(lv_scr_act(),"NOT SAVED"));fake_preferences::state().failWrite=false;click("SAVE");assert(button(lv_scr_act(),"TIME")&&orbit_time::saved());orbit_time::alarm(7,30,false);
+    click("A1");click("07:30");click("+");fake_preferences::state().failWrite=true;click("SAVE");assert(button(lv_scr_act(),"SAVE")&&has_label(lv_scr_act(),"NOT SAVED"));fake_preferences::state().failWrite=false;click("SAVE");assert(button(lv_scr_act(),"A1")&&orbit_time::saved());orbit_time::alarm(7,30,false);
     orbit_time::preset(300);orbit_clock::fixture.hour=0;orbit_clock::fixture.minute=orbit_clock::fixture.second=0;orbit_clock::fixture.day=26;orbit_clock::fixture.weekday=1;orbit_clock::fixture.dateKey=20261026;advance(1200);assert(has_label(lv_scr_act(),"MON 26 OCT")&&has_label(lv_scr_act(),"00:00"));
     orbit_clock::fixture.status=orbit_clock::Status::Offline;advance(1200);assert(has_label(lv_scr_act(),"CONNECT TO WI-FI")&&!has_label(lv_scr_act(),"PDT"));s3::next.connected=true;s3::pending=true;advance(300);swipePointer(240,240,0,-110);assert(button(lv_scr_act(),"I/O"));
     const auto homeClockReads=orbit_clock::reads;advance(1200);assert(orbit_clock::reads==homeClockReads);
@@ -1210,7 +1231,7 @@ int main(int argc,char **argv) {
         assert(s3::writes==navigationWrites && s3::volume_writes==navigationVolumeWrites);
     }
     // Hidden standby arc is ordinary navigation space, not a Volume gesture.
-    swipePointer(240,48,0,110);assert(button(lv_scr_act(),"TIME"));
+    swipePointer(240,48,0,110);assert(button(lv_scr_act(),"A1"));
     swipePointer(240,240,0,-110);assert(button(lv_scr_act(),"Wake"));
     s3::next.power=s3::PowerState::Online;s3::pending=true;advance(300);assert(button(lv_scr_act(),"I/O"));
     assert(s3::writes==navigationWrites && s3::volume_writes==navigationVolumeWrites);
@@ -1244,7 +1265,7 @@ int main(int argc,char **argv) {
         assertGroup(horizontal,outgoing);
         if(delta.y>0&&argc>15){for(int i=0;i<5;++i){char path[512];snprintf(path,sizeof(path),"%s/clock-motion-%02d.ppm",argv[15],i);dumpFrame(path);advance(20);}}
         else advance(100);
-        auto *caption=find_named_label(lv_scr_act(),delta.x<0?"Swiped left":delta.x>0?"AirPlay":delta.y<0?"Weather":"ALARM OFF");assert(caption);
+        auto *caption=find_named_label(lv_scr_act(),delta.x<0?"Swiped left":delta.x>0?"AirPlay":delta.y<0?"Weather":"PDT");assert(caption);
         auto *page=lv_obj_get_parent(caption);
         const int before=horizontal?lv_obj_get_style_translate_x(page,0):lv_obj_get_style_translate_y(page,0);
         assert(before!=0&&abs(before)<=64);assert((before>0)==(delta.x<0||delta.y<0));
@@ -1276,10 +1297,10 @@ int main(int argc,char **argv) {
     // Idle cancellation snaps to exact destination geometry; it cannot repaint
     // later or restart a transition on wake.
     startSlide(0,110);assert(button(lv_scr_act(),"I/O")); // Idle interrupts outgoing phase.
-    orbit_ui_set_screen_awake(false);auto *clockLocation=find_named_label(lv_scr_act(),"ALARM OFF");assert(clockLocation);
+    orbit_ui_set_screen_awake(false);auto *clockLocation=find_named_label(lv_scr_act(),"PDT");assert(clockLocation);
     assert(lv_obj_get_style_translate_y(lv_obj_get_parent(clockLocation),0)==0);
     assert(lv_anim_count_running()==animationsBefore);advance(500);orbit_ui_set_screen_awake(true);advance(100);
-    assert(button(lv_scr_act(),"TIME")&&lv_obj_get_style_translate_y(clockLocation,0)==0);
+    assert(button(lv_scr_act(),"A1")&&lv_obj_get_style_translate_y(clockLocation,0)==0);
     swipePointer(240,240,0,-110);assert(button(lv_scr_act(),"I/O"));
     // External standby during Home entry keeps the destination; held contact cannot Wake.
     swipePointer(240,187,0,110);startSlide(0,-110);pointer(240,240,true,40);
@@ -1287,7 +1308,7 @@ int main(int argc,char **argv) {
     pointer(240,240,true,60);pointer(240,240,false,80);assert(s3::writes==slideWrites);
     s3::next.power=s3::PowerState::Online;s3::pending=true;advance(300);assert(button(lv_scr_act(),"I/O"));
     startSlide(0,110);s3::next.power=s3::PowerState::Standby;s3::pending=true;advance(400);
-    assert(button(lv_scr_act(),"TIME") && !button(lv_scr_act(),"Wake"));
+    assert(button(lv_scr_act(),"A1") && !button(lv_scr_act(),"Wake"));
     swipePointer(240,240,0,-110);assert(button(lv_scr_act(),"Wake"));
     s3::next.power=s3::PowerState::Online;s3::pending=true;advance(300);
     for(int i=0;i<20;++i){swipePointer(240,187,-110,0);swipePointer(240,240,110,0);assert(lv_anim_count_running()==animationsBefore);}
@@ -1447,6 +1468,21 @@ int main(int argc,char **argv) {
     const auto beforeDown=lv_obj_get_scroll_y(readerViewport);pointer(240,205,true);pointer(240,270,true);assert(lv_obj_get_scroll_y(readerViewport)<beforeDown);pointer(240,280,false);advance(500);
     // A reading drag may end over Back without turning into a button tap.
     pointer(240,280,true);pointer(240,350,true);pointer(240,430,true);pointer(240,430,false);advance(500);assert(reading_view(lv_scr_act())==readerViewport);
+    // Real UI sequence from hardware acceptance: complete Song, cancel a
+    // different topic during loading, and reopen Song synchronously. No new
+    // request and no late reply may replace the completed Song cache.
+    click("Back");orbit_ui_intro_mock_scenario(0);click("Song");advance(1700);
+    assert(has_label(lv_scr_act(),"Local sample"));click("Back");
+    for(const char *pendingTopic:{"Artist","Release"}){
+        click(pendingTopic);advance(100);assert(has_label(lv_scr_act(),"Loading"));
+        click("Back");const auto canceledTopicStarts=orbit_ui_intro_mock_starts();
+        click("Song");assert(has_label(lv_scr_act(),"Local sample | Saved"));
+        assert(orbit_ui_intro_mock_starts()==canceledTopicStarts);
+        advance(2000);assert(has_label(lv_scr_act(),"Local sample | Saved"));
+        assert(orbit_ui_intro_mock_starts()==canceledTopicStarts);click("Back");
+    }
+    click("Artist");advance(1700);assert(has_label(lv_scr_act(),"Local sample"));
+    puts("PASS: actual LVGL Song completion -> pending Artist/Release -> Back -> immediate cached Song; no extra request or late overwrite");
     click("Back");click("Release");advance(1700);click("Back");click("Song");advance(1700);click("Back");
     const auto tourStarts=orbit_ui_intro_mock_starts();
     for(const char *topic:{"Artist","Release","Song"}){click(topic);assert(has_label(lv_scr_act(),"Local sample | Saved")&&orbit_ui_intro_mock_starts()==tourStarts);click("Back");}
@@ -1524,4 +1560,5 @@ int main(int argc,char **argv) {
     assert(s3::writes==introWrites&&s3::volume_writes==introVolumeWrites);
     puts("PASS: radial Artist/Release/Song targets, actual continuous vertical LVGL scroll during contact, reverse/bounds/end-over-Back, horizontal return, captured context, UTF-8,8 themes/idle; no audio writes");
     puts("PASS: conditional lyric badge/cover-vinyl hit/seek-pause-clock synchronization/CJK-wrap/idle/tap-return/stale-track cleanup, no audio writes; actual weather snapshot UI/8 palettes/conditions/cache/offline/idle, no fabricated values;280ms whole-page exit/entry, uniform ring/header/source/footer/transport/artwork displacement, actual moving pixels/settled geometry/no scale, full-contact input guard, idle/standby cancellation,20 repeated cycles; network clock offline/sync/ready, Wi-Fi vs S3 independence, idle and directional markers; intent-first pending/tap/drag, lower/header enabled-disabled button swipes, ring tap/jitter/drag and no audio misfires; four swipe pages/real cover and button arbitration/diagonal and timeout/blank idle/standby; native LVGL UI, I/O About/Theme navigation/back and IP/status values, offline themes, 100 palette switches, UTF-8 labels and actual long-artist scroll/unchanged-poll/short-name/idle behavior, clean record center and rotating highlights, larger disjoint touch targets, icon-only mute/header feedback and read-only +/-, original chain/orbit footer assets and verified readback feedback and circular constant-style mute; cover/fallback lifecycle, detailed artwork cache, reversible open/close animation, idle settlement, same-revision/track/standby cleanup and play/pause rotation; no actual network writes");
+#endif
 }

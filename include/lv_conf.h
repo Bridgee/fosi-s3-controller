@@ -11,3 +11,7 @@
 // QR generation is used only by the opt-in introduction reader.
 #undef LV_USE_QRCODE
 #define LV_USE_QRCODE 1
+
+// Only numeric volume/temperature labels use 48px; use the identical UI subset.
+#undef LV_FONT_MONTSERRAT_48
+#define LV_FONT_MONTSERRAT_48 0
